@@ -13,7 +13,17 @@
                     </span>
                     {{ config('app.name', 'Laravel') }}
                 </a>
+                
+            <div class="text-center px-6">
+        <h1
+            class="text-6xl md:text-8xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-400 text-transparent bg-clip-text animate-pulse">
+            {{ config('app.name', 'Laravel') }}
+        </h1>
+        <p class="mt-8 text-lg md:text-2xl opacity-80">very much a "work in progress"</p>
+        <div class="mt-8">
 
+        </div>
+        </div>
                 @php
                     [$message, $author] = str(Illuminate\Foundation\Inspiring::quotes()->random())->explode('-');
                 @endphp
@@ -38,6 +48,7 @@
                 </div>
             </div>
         </div>
+
         @fluxScripts
     </body>
 </html>

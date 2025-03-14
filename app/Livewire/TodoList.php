@@ -359,5 +359,14 @@ class TodoList extends Component
         Flux::modal('addTask')->show();
     }
 
+    public function closeTaskWindow() {
+        Log::info("Close Task Window");
+        $this->viewItem = null;
+        $this->editItem = null;
+        Flux::modals()->close();
+
+        $this->reset(['title', 'desc', 'due', 'priority', 'slug']);
+        Flux::modal('addTask')->close();
+    }
 
 }

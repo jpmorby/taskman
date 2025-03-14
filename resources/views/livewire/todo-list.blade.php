@@ -58,6 +58,7 @@
 
 
         <flux:modal name="addTask" class="w-6/12">
+
             <form wire:submit="create">
                 <flux:input label="Title" wire:model="title" class="mb-2" />
                 
@@ -68,8 +69,17 @@
                     <flux:table.rows>
                         <flux:table.row>
                             <flux:table.cell>
-                                <flux:date-picker label="Due Date" wire:model="due" class="mt-2" />
-
+                                <flux:input 
+                                    type="date" 
+                                    max="2999-12-31" 
+                                    label="Due Date" 
+                                    wire:model="due" 
+                                    class="mt-2" 
+                                    error="{{ $errors->first('due') }}"
+                                />
+                                @error('due')
+                                        {{ $message }}
+                                @enderror
                             </flux:table.cell>
                             <flux:table.cell>
                                 <flux:select label="Priority" wire:model="priority" class="mt-2">
@@ -88,7 +98,7 @@
                 <flux:spacer />
 
                 <flux:button type="submit" class="mt-5">Save</flux:button>
-                <flux:button variant="ghost" class="mt-5" x-on:click="$flux.modal('addTask').close()">Cancel</flux:button>
+                <flux:button variant="ghost" class="mt-5" wire:click="closeTaskWindow()">Cancel</flux:button>
             </form>
         </flux:modal>
     </div>

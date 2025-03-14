@@ -1,3 +1,4 @@
+
 <flux:table class="items-center w-full table-fixed" :paginate="$this->tasks">
     <flux:table.columns>
         <flux:table.column class="w-1/12" sortable :sorted="$sortBy === 'completed'" :direction="$sortDirection"
@@ -45,7 +46,9 @@
 
                     {{-- <flux:table.cell>{{ $task->created_at->diffForHumans() }}</flux:table.cell> --}}
 
-                    <flux:table.cell>{{ ($task->due ? $task->due->diffForHumans() : "Not Set")}}</flux:table.cell>
+                    <flux:table.cell>{{ ($task->due ? $task->due->diffForHumans() : "Not Set")}}
+  
+                    </flux:table.cell>
                     <flux:table.cell>{{  $task->priority }}</flux:table.cell>
 
 
