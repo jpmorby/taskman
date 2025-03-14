@@ -24,46 +24,49 @@
     </flux:table.columns>
     <flux:table.rows>
         @foreach($tasks as $index => $task)
-                            @php
-                $isChecked = $task->completed ? 'checked' : ''
-                            @endphp
-                            <flux:table.row :wire:key="$task->id">
+                        @php
+                            $isChecked = $task->completed ? 'checked' : ''
+                        @endphp
+                        <flux:table.row :wire:key="$task->id">
+                            {{-- <flux:table.cell>
+                                <flux:checkbox :checked="$task->completed" wire:model="$tasks[{{ $index }}].completed"
+                                    wire:click="toggleCompleted({{ $task->id }})" />
+                            </flux:table.cell> --}}
+                            <flux:table.cell>
+                                <flux:checkbox {{ $isChecked }} wire:click="toggleCompleted({{ $task->id }})" />
+                            </flux:table.cell>
+                            {{--
+                            @if ($task->completed)
+                            <flux:table.cell>
+                                <flux:checkbox checked wire:click="toggleCompleted({{ $task->id }})" />
+                            </flux:table.cell>
+
+                            @else
+                            <flux:table.cell>
+                                <flux:checkbox wire:click="toggleCompleted({{ $task->id }})" />
+                            </flux:table.cell>
+
+                            @endif --}}
+                            <flux:table.cell>{{  $task->title }}</flux:table.cell>
+                            <flux:table.cell>{{ Str::substr($task->desc, 0, 30) }}</flux:table.cell>
+                            <flux:table.cell>
+                                {{  $task->created_at->diffForHumans() }}
+                            </flux:table.cell>
+                            <flux:table.cell>{{ ($task->due ? $task->due->diffForHumans() : "Not Set")}}
+                            </flux:table.cell>
+                            @if($editItem)
                                 <flux:table.cell>
-                                    <flux:checkbox :checked="$task->completed" wire:model.live="$tasks[{{ $index }}].completed"
-                                        wire:click="toggleCompleted({{ $task->id }})" />
+                                    <flux:input label="Title" wire:model="task->title" description="Edit title" />
+                                    <flux:input wire:model="task->desc" />
                                 </flux:table.cell>
-            {{--
-            @if ($task->completed)
-            <flux:table.cell>
-                <flux:checkbox checked wire:click="toggleCompleted({{ $task->id }})" />
-            </flux:table.cell>
-
-            @else
-            <flux:table.cell>
-                <flux:checkbox wire:click="toggleCompleted({{ $task->id }})" />
-            </flux:table.cell>
-
-            @endif --}}
-                                <flux:table.cell>{{  $task->title }}</flux:table.cell>
-                                <flux:table.cell>{{ Str::substr($task->desc, 0, 30) }}</flux:table.cell>
-                                <flux:table.cell>
-                                    {{  $task->created_at->diffForHumans() }}
+                            @else
+                                <flux:table.cell class="w-2/12">
+                                    <flux:button variant="primary" wire:click="edit({{ $task->id }})">Edit</flux:button> &nbsp;
+                                    <flux:button variant="danger" wire:click="delete({{ $task->id }})">Delete</flux:button>
                                 </flux:table.cell>
-                                <flux:table.cell>{{ ($task->due ? $task->due->diffForHumans() : "Not Set")}}
-                                </flux:table.cell>
-                                @if($editItem)
-                                    <flux:table.cell>
-                                        <flux:input label="Title" wire:model="task->title" description="Edit title" />
-                                        <flux:input wire:model="task->desc" />
-                                    </flux:table.cell>
-                                @else
-                                    <flux:table.cell class="w-2/12">
-                                        <flux:button variant="primary" wire:click="edit({{ $task->id }})">Edit</flux:button> &nbsp;
-                                        <flux:button variant="danger" wire:click="delete({{ $task->id }})">Delete</flux:button>
-                                    </flux:table.cell>
 
-                                @endif
-                            </flux:table.row>
+                            @endif
+                        </flux:table.row>
         @endforeach
     </flux:table.rows>
 </flux:table>
