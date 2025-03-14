@@ -219,41 +219,55 @@ class TodoList extends Component
         ];
     }
 
-    public function showAll()
+    private function baseQuery()
     {
         return Auth::user()->tasks()
+            ->where(function ($query) {
+                $query->where('title', 'like', '%' . $this->needle . '%')
+                      ->orWhere('desc', 'like', '%' . $this->needle . '%');
+            });
+    }
+
+    public function showAll()
+    {
+        return $this->baseQuery()
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showActive()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showCompleted()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('completed', true)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showUncompleted()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showOverdue()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('due', '<', now())
             ->where('completed', false) 
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showToday()
     {
         return Auth::user()->tasks()
@@ -321,6 +335,12 @@ class TodoList extends Component
     {
         $this->activeFilter = $filter;
         // Reset pagination when changing filters
+        $this->resetPage();
+    }
+
+    public function updatedNeedle()
+    {
+        // Reset pagination when search term changes
         $this->resetPage();
     }
 }
