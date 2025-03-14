@@ -13,6 +13,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Enums\PriorityLevel;
 
 class TodoList extends Component
 {
@@ -74,6 +75,7 @@ class TodoList extends Component
     public function addTask()
     {
         Log::info('addTask');
+        $this->priority = PriorityLevel::LOW;
 
         Flux::modal('addTask')->show();
 
