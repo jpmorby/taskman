@@ -38,7 +38,7 @@ class TodoList extends Component
 
     public bool $completed = false;
 
-    public $editItem;
+    public $editItem, $viewItem, $viewTask;
 
     public $user_id;
 
@@ -345,4 +345,19 @@ class TodoList extends Component
         // Reset pagination when search term changes
         $this->resetPage();
     }
+
+    public function showCard($id) {
+        Log::info("Show Card ($id)");
+        
+        $this->viewItem = Task::findOrFail($id);
+
+        $this->title = $this->viewItem->title;
+        $this->desc = $this->viewItem->desc;
+        $this->due = $this->viewItem->due;
+        $this->priority = $this->viewItem->priority;
+
+        Flux::modal('addTask')->show();
+    }
+
+
 }

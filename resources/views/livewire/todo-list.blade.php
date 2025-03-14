@@ -86,7 +86,9 @@
                                     </flux:table>
 
                 <flux:spacer />
+
                 <flux:button type="submit" class="mt-5">Save</flux:button>
+                <flux:button variant="ghost" class="mt-5" x-on:click="$flux.modal('addTask').close()">Cancel</flux:button>
             </form>
         </flux:modal>
     </div>
