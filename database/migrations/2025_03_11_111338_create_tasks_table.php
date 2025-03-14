@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('due')->nullable();
             $table->boolean('completed')->default(false);
             $table->json('media')->nullable();
-            $table->enum('priority', ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'])->default('LOW');
+            $table->enum('priority', ['NONE', 'UNASSIGNED', 'PENDING', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'])->default('LOW');
             $table->timestamps();
         });
     }
