@@ -33,7 +33,7 @@ class TodoList extends Component
     public bool $completed = false;
     public $editItem;
     public $user_id;
-    public $tasks;
+    // public $tasks;
 
     #[Rule('string|min:3')]
     public $needle = '';
@@ -144,15 +144,15 @@ class TodoList extends Component
             ->paginate(3);
 
         return view(
-            'livewire.todo-list'
+            // 'livewire.todo-list'
 
-            // 'livewire.todo-list',
-            // [
-            //     'tasks' => auth()->user()->tasks()
-            //         ->where('title', 'like', "%{$this->needle}%")
-            //         ->orderBy($this->sortBy, $this->sortDirection)
-            //         ->paginate(3)
-            // ]
+            'livewire.todo-list',
+            [
+                'tasks' => auth()->user()->tasks()
+                    ->where('title', 'like', "%{$this->needle}%")
+                    ->orderBy($this->sortBy, $this->sortDirection)
+                    ->paginate(3)
+            ]
         );
     }
 
