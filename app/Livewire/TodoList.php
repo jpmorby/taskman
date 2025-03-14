@@ -48,11 +48,18 @@ class TodoList extends Component
         // dd(Auth::check());
 
         $this->user_id = Auth::id();
+    
     }
     public function sort($index)
     {
-        $this->sortBy = $index;
-        $this->render();
+        if ($this->sortBy === $index) {
+            // If clicking the same column, toggle direction
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            // New column, set as the sort field and default to ascending
+            $this->sortBy = $index;
+            $this->sortDirection = 'asc';
+        }
     }
     public function create()
     {
@@ -76,7 +83,7 @@ class TodoList extends Component
         $this->reset('title', 'desc', 'due');
         Flux::modal("addTask")->close();
         $this->dispatch('task-created');
-        $this->render();
+        // $this->render();
 
     }
 
@@ -110,8 +117,8 @@ class TodoList extends Component
         // fetch records from the DB -- perhaphs paginate?
         // return 
         $this->tasks = Task::latest()
-            ->where('title', 'like' . '%{$needle}%')
-            ->paginate(10);
+            ->where('title', 'like', '%' . $this->needle . '%')
+            ->paginate($records);
     }
 
     public function toggleCompleted($id)
@@ -134,17 +141,16 @@ class TodoList extends Component
     {
         // return Task::findOrFail($needle);
         $this->needle = $needle;
-        $this->render();
+        // $this->render();
     }
     public function render()
     {
-        $this->tasks = auth()->user()->tasks()
-            ->where('title', 'like', "%{$this->needle}%")
-            ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate(3);
+        // $this->tasks = auth()->user()->tasks()
+        //     ->where('title', 'like', "%{$this->needle}%")
+        //     ->orderBy($this->sortBy, $this->sortDirection)
+        //     ->paginate(3);
 
         return view(
-            // 'livewire.todo-list'
 
             'livewire.todo-list',
             [
