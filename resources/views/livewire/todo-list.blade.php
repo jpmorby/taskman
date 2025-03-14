@@ -1,38 +1,37 @@
 <div>
-    <flux:header>To Do List</flux:header>
-    <div id="search" class="px-5 py-5 mb-10">
-        <flux:input wire:keydown.meta.k="search" kbd="⌘K" label="Search: " icon="magnifying-glass"
-            wire:model.debounce.500ms.live="needle" />
+    <flux:heading size="lg">To Do List</flux:heading>
+
+    <div id="search" class="p-5 mb-5">
+        <flux:input
+            wire:keydown.meta.k="search"
+            kbd="⌘K"
+            label="Search:"
+            icon="magnifying-glass"
+            wire:model.live.debounce.500ms="needle"
+        />
     </div>
 
-    <div id="limits" class="px-5 py-5 mb-10">
-        <flux:dropdown @if ($tasks) <div class="p-10">
-                    <flux:card>
+    <div id="limits" class="p-5 mb-5">
+        <flux:card>
+            @if ($this->tasks->isNotEmpty())
+                @include("livewire.todo-card")
+            @else
+                <h1>You have no tasks at this time. Create one!</h1>
+            @endif
+        </flux:card>
 
-                        @include("livewire.todo-card")
+        <flux:button wire:click="addTask" variant="primary" class="mt-5">Add Task</flux:button>
 
-                    </flux:card>
-            </div>
+        <flux:modal name="addTask" class="w-6/12">
+            <form wire:submit="create">
+                <flux:input label="title" wire:model="title" />
 
-        @else
-            <div class="p-10">
-                <flux:card>
-                    <h1>You have no tasks at this time. Create one!</h1>
-                </flux:card>
-            </div>
-        @endif
+                <flux:input label="desc" wire:model="desc" />
 
-    <flux:button class="mt-5 py-10" wire:click="addTask">Add Task</flux:button>
+                <flux:date-picker wire:model="due" />
 
-
-    <flux:modal name="addTask" class="w-6/12">
-        <form>
-            <flux:input label="title" name="title" wire:model="title" />
-            <flux:input label="desc" type="text" name="desc" wire:model="desc" />
-            <flux:date-picker wire:model="due" />
-            <flux:button class="mt-5" wire:click="create">Save</flux:button>
-        </form>
-    </flux:modal>
-
-
+                <flux:button type="submit" class="mt-5">Save</flux:button>
+            </form>
+        </flux:modal>
+    </div>
 </div>

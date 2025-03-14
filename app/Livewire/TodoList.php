@@ -2,17 +2,17 @@
 
 namespace App\Livewire;
 
-use Auth;
-use Carbon\Traits\Timestamp;
-use Exception;
+use App\Models\Task;
 use Flux\Flux;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
-use App\Models\Task;
 use Livewire\WithPagination;
-use Illuminate\Support\Facades\DB;
 
 class TodoList extends Component
 {
@@ -20,18 +20,25 @@ class TodoList extends Component
 
     #[Rule('required|min:5|max:250')]
     public $title;
+
     #[Rule('required')]
     public string $desc;
 
     #[Rule('required')]
     public $priority;
+
     #[Rule('required|string|max:255')]
     public string $slug;
+
     public array $media;
-    #[Rule("date|required")]
+
+    #[Rule('date|required')]
     public $due;
+
     public bool $completed = false;
+
     public $editItem;
+
     public $user_id;
     // public $tasks;
 
@@ -39,17 +46,17 @@ class TodoList extends Component
     public $needle = '';
 
     public $searchResults;
+
     public $sortBy = 'due';
+
     public $sortDirection = 'asc';
 
     public function mount()
     {
-        // $this->fetch();
-        // dd(Auth::check());
-
         $this->user_id = Auth::id();
-    
+
     }
+
     public function sort($index)
     {
         if ($this->sortBy === $index) {
@@ -61,113 +68,94 @@ class TodoList extends Component
             $this->sortDirection = 'asc';
         }
     }
+
+    public function addTask()
+    {
+        Log::info('addTask');
+
+        Flux::modal('addTask')->show();
+
+    }
+
     public function create()
     {
-        Log::info("create");
+        Log::info('create');
 
         $this->slug = Str::of($this->title)->slug();
 
         Log::debug("Slug: $this->slug");
+
         $this->priority = 'LOW';
+
         $this->validate();
 
-        auth()->user()->tasks()->create([
-            'user_id'   => auth()->id(),
-            'title'     => $this->title,
-            'slug'      => $this->slug,
-            'desc'      => $this->desc,
-            'due'       => $this->due,
-            'completed' => false
+        Auth::user()->tasks()->create([
+            'user_id' => Auth::id(),
+            'title' => $this->title,
+            'slug' => $this->slug,
+            'desc' => $this->desc,
+            'due' => $this->due,
+            'completed' => false,
         ]);
 
         $this->reset('title', 'desc', 'due');
-        Flux::modal("addTask")->close();
-        $this->dispatch('task-created');
-        // $this->render();
 
+        Flux::modal('addTask')->close();
+
+        $this->dispatch('task-created');
+    }
+
+    // public function store()
+    // {
+    //     $this->dispatch('task-updated');
+
+    //     // save record into db
+    //     Log::info('Store');
+    // }
+
+    public function update()
+    {
+        // edit/update an existing task
+        Log::info('update');
+
+        $this->dispatch('task-updated');
     }
 
     public function delete($id)
     {
         Log::info("Delete ($id)");
+
         Task::findOrFail($id)->delete();
-        // delete a task from the db
+
         $this->dispatch('task-deleted');
 
     }
 
-    public function update()
+    public function updated(string $name, mixed $value): void
     {
-        // edit/update an existing task
-        Log::info("update");
-
-        $this->dispatch('task-updated');
-    }
-
-    public function store()
-    {
-        $this->dispatch('task-updated');
-
-        // save record into db
-        Log::info("Store");
-    }
-
-    public function fetch(int $records = 100)
-    {
-        // fetch records from the DB -- perhaphs paginate?
-        // return 
-        $this->tasks = Task::latest()
-            ->where('title', 'like', '%' . $this->needle . '%')
-            ->paginate($records);
+        // dd($name, $value);
     }
 
     public function toggleCompleted($id)
     {
-        debug("id $id");
-        // debug("Completed: $this->completed");
+        $task = Task::findOrFail($id);
 
-        // $task = Task::findorfail($id); //->update('completed' => $completed);
-
-        $task = auth()->user()->tasks()->findOrFail($id);
-        auth()->user()->tasks()->findOrFail($id)->update([
-            'completed' => !$task->completed,
+        $task->update([
+            'completed' => ! $task->completed,
         ]);
-
-
-        // save the updated record
-        // Task::where('id', '=', $id)->update($this);
     }
-    public function find(string $needle)
+
+    #[Computed()]
+    public function tasks(): LengthAwarePaginator
     {
-        // return Task::findOrFail($needle);
-        $this->needle = $needle;
-        // $this->render();
+        return Auth::user()->tasks()
+            ->where('title', 'like', '%'.$this->needle.'%')
+            ->orderBy($this->sortBy, $this->sortDirection)
+            ->paginate(3);
     }
+
     public function render()
     {
-        // $this->tasks = auth()->user()->tasks()
-        //     ->where('title', 'like', "%{$this->needle}%")
-        //     ->orderBy($this->sortBy, $this->sortDirection)
-        //     ->paginate(3);
-
-        return view(
-
-            'livewire.todo-list',
-            [
-                'tasks' => auth()->user()->tasks()
-                    ->where('title', 'like', "%{$this->needle}%")
-                    ->orderBy($this->sortBy, $this->sortDirection)
-                    ->paginate(3)
-            ]
-        );
-    }
-
-    public function addTask()
-    {
-        Log::info("addTask");
-
-        Flux::modal("addTask")->show();
-
-
+        return view('livewire.todo-list');
     }
 }
