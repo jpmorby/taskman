@@ -27,7 +27,6 @@ class TodoList extends Component
     #[Rule('required')]
     public $priority;
 
-    // #[Rule('required|string|max:255')]
     public string $slug;
 
     public array $media;
@@ -251,6 +250,7 @@ class TodoList extends Component
     {
         return Auth::user()->tasks()
             ->where('due', '<', now())
+            ->where('completed', false) 
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -258,6 +258,7 @@ class TodoList extends Component
     {
         return Auth::user()->tasks()
             ->where('due', now())
+            ->where( 'completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -266,6 +267,7 @@ class TodoList extends Component
         return Auth::user()->tasks()
             ->where('due', '>=', now()->startOfWeek())
             ->where('due', '<=', now()->endOfWeek())
+            ->where( 'completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -274,6 +276,7 @@ class TodoList extends Component
         return Auth::user()->tasks()
             ->where('due', '>=', now()->startOfMonth())
             ->where('due', '<=', now()->endOfMonth())
+            ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -282,6 +285,7 @@ class TodoList extends Component
         return Auth::user()->tasks()
             ->where('due', '>=', now()->startOfYear())
             ->where('due', '<=', now()->endOfYear())
+            ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -290,6 +294,7 @@ class TodoList extends Component
         return Auth::user()->tasks()
             ->where('due', '>=', now())
             ->where('due', '<=', now()->addDays(7))
+            ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -298,6 +303,7 @@ class TodoList extends Component
         return Auth::user()->tasks()
             ->where('due', '>=', now())
             ->where('due', '<=', now()->addDays(30))
+            ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -306,6 +312,7 @@ class TodoList extends Component
         return Auth::user()->tasks()
             ->where('due', '>=', now())
             ->where('due', '<=', now()->addDays(90))
+            ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
