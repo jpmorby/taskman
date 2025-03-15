@@ -95,7 +95,12 @@
     <!-- Tasks Content -->
     <flux:card class="mb-6 p-5">
         @if ($this->tasks->isNotEmpty())
-            @include('livewire.todo-card')
+            <div class="md:block hidden item-center w-full">
+                @include('livewire.todo-card')
+            </div>
+            <div class="md:hidden block item-center w-full">
+                @include('livewire.todo-card-mobile')
+            </div>
         @elseif ($activeFilter)
             <div class="py-12 text-center">
                 <flux:icon name="clipboard-document" class="mx-auto h-12 w-12 text-gray-400" />
