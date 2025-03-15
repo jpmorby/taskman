@@ -44,12 +44,11 @@
             </p>
 
             <div class="space-y-3">
-                <flux:radio wire:model="duplicateAction" id="skip" value="skip"
-                    label="Skip duplicates (import only new tasks)" />
-                <flux:radio wire:model="duplicateAction" id="overwrite" value="overwrite"
-                    label="Overwrite existing tasks with imported data" />
-                <flux:radio wire:model="duplicateAction" id="keep_both" value="keep_both"
-                    label="Keep both (create duplicate tasks)" />
+                <flux:radio.group wire:model="duplicateAction">
+                    <flux:radio id="skip" value="skip" label="Skip duplicates (import only new tasks)" />
+                    <flux:radio id="overwrite" value="overwrite" label="Overwrite existing tasks with imported data" />
+                    <flux:radio id="keep_both" value="keep_both" label="Keep both (create duplicate tasks)" />
+                </flux:radio.group>
             </div>
 
             @if (count($potentialDuplicates) > 0)
@@ -96,10 +95,10 @@
             @endif
 
             <div class="flex justify-between border-t pt-4">
-                <flux:button type="button" variant="ghost" x-on:click="cancelImport">
+                <flux:button wire:click="cancelImport" variant="ghost">
                     Cancel
                 </flux:button>
-                <flux:button type="button" variant="primary" x-on:click="processImport">
+                <flux:button wire:click="processImport" variant="primary">
                     Continue Import
                 </flux:button>
             </div>
