@@ -36,12 +36,12 @@
                     </flux:table.cell>
 
                     <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">
-                      <flux:label>{{  Str::limit($task->title, 15) }}</flux:label>
+                      <flux:label>{{  Str::limit($task->title, 20) }}</flux:label>
                       </flux:table.cell>
 
                     <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">
 
-                        {{ Str::limit($task->desc, 30) }}
+                        {{ Str::limit($task->desc, 40) }}
                     </flux:table.cell>
 
                     {{-- <flux:table.cell>{{ $task->created_at->diffForHumans() }}</flux:table.cell> --}}
