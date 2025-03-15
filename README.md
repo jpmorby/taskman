@@ -22,3 +22,7 @@ Using as many FluxUI features as I can to simplify design (as I'm lousy at desig
 - Reverb for notifications (backup jobs / etc)
 - Add file attachment so you can add docs to the tasks
 
+## License
+
+This project is open-sourced software licensed under the [MIT license](LICENSE).
+
