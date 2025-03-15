@@ -57,9 +57,19 @@
                 </flux:table.cell>
 
 
-                <flux:table.cell class="w-2/12">
-                    <flux:button variant="danger" icon="trash" wire:click="delete({{ $task->id }})" size="xs" />
+                <flux:table.cell class="w-2/12" x-data="{ confirmDelete: false }">
+                    <div x-show="!confirmDelete" class="flex justify-center">
+                        <flux:button variant="danger" icon="trash" x-on:click.stop="confirmDelete = true" size="xs" />
+                    </div>
 
+                    <div x-show="confirmDelete" x-cloak class="flex items-center space-x-1 justify-center">
+                        <flux:button variant="danger" size="xs" wire:click.stop="delete({{ $task->id }})">
+                            Yes
+                        </flux:button>
+                        <flux:button variant="ghost" size="xs" x-on:click.stop="confirmDelete = false">
+                            No
+                        </flux:button>
+                    </div>
                 </flux:table.cell>
             </flux:table.row>
         @endforeach

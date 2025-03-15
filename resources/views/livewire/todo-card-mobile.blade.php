@@ -15,22 +15,19 @@
                 </div>
                 
                 <!-- Priority badge -->
-                <div class="flex-shrink-0">          
+                <div class="flex-shrink-0 overflow:hidden">          
                     @switch($task->priority)
                         @case(\App\Enums\PriorityLevel::CRITICAL)
                         <flux:badge color="purple">{{ $task->priority->label() }}</flux:badge>
-
                             @break
                         @case(\App\Enums\PriorityLevel::HIGH)
                         <flux:badge color="red">{{ $task->priority->label() }}</flux:badge>
                             @break
                         @case(\App\Enums\PriorityLevel::MEDIUM)  
-                          <flux:badge color="lime">{{ $task->priority->label() }}</flux:badge>
-
+                        <flux:badge color="lime">{{ $task->priority->label() }}</flux:badge>
                             @break
                         @default
                         <flux:badge color="cyan">{{ $task->priority->label() }}</flux:badge>
-
                     @endswitch
                 </div>
             </div>
@@ -66,19 +63,43 @@
                     @endif
                 </div>
                 
-                <div class="flex space-x-2">
+                <!-- Delete button with confirmation - using Alpine.js -->
+                <div class="flex space-x-2" x-data="{ confirmDelete: false }">
                     <flux:button 
                         icon="pencil" 
                         wire:click.stop="edit({{ $task->id }})" 
                         size="xs" 
                         variant="ghost"
                     />
-                    <flux:button 
-                        variant="danger" 
-                        icon="trash" 
-                        wire:click.stop="delete({{ $task->id }})" 
-                        size="xs"
-                    />
+                    
+                    <!-- Delete button that shows confirmation -->
+                    <div x-show="!confirmDelete">
+                        <flux:button 
+                            variant="danger" 
+                            icon="trash" 
+                            x-on:click.stop="confirmDelete = true" 
+                            size="xs"
+                        />
+                    </div>
+                    
+                    <!-- Confirmation buttons -->
+                    <div x-show="confirmDelete" x-cloak class="flex space-x-1 items-center">
+                        <span class="text-xs text-red-500">Delete?</span>
+                        <flux:button 
+                            variant="danger" 
+                            size="xs"
+                            wire:click.stop="delete({{ $task->id }})" 
+                        >
+                            Yes
+                        </flux:button>
+                        <flux:button 
+                            variant="ghost" 
+                            size="xs"
+                            x-on:click.stop="confirmDelete = false" 
+                        >
+                            No
+                        </flux:button>
+                    </div>
                 </div>
             </div>
         </div>
