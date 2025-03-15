@@ -34,6 +34,7 @@ class TodoList extends Component
 
     #[Rule('date|required')]
     public $due;
+    
     public int $tableLength = 10;
 
     public bool $completed = false;
@@ -90,7 +91,7 @@ class TodoList extends Component
             } catch (\Illuminate\Validation\ValidationException $e) {
                 // Log validation errors
                 Log::error('Validation failed: ' . json_encode($e->errors()));
-                return;
+                throw $e;
             }
 
             // If we are editing an existing task, we don't want to create a new one
@@ -111,6 +112,7 @@ class TodoList extends Component
                 $this->dispatch('task-updated');
             } catch (\Exception $e) {
                 Log::error('Update failed: ' . $e->getMessage());
+                throw $e;
             }
 
             return;
@@ -142,8 +144,11 @@ class TodoList extends Component
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Log validation errors
             Log::error('Validation failed: ' . json_encode($e->errors()));
+            throw $e;
+
         } catch (\Exception $e) {
             Log::error('Create task failed: ' . $e->getMessage());
+            throw $e;
         }
     }
 

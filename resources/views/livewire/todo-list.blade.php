@@ -44,7 +44,16 @@
                 variant="{{ $activeFilter === 'next30Days' ? 'primary' : 'ghost' }}">
                 Next 30 Days
             </flux:button>
+            <flux:spacer/>
+            <div><flux:select wire:model.live="tableLength" label="Show">
+            <flux:select.option value="5">5</flux:select.option>
+            <flux:select.option value="10">10</flux:select.option>
+            <flux:select.option value="25">25</flux:select.option>
+            <flux:select.option value="50">50</flux:select.option>
+            <flux:select.option value="100">100</flux:select.option>
+    </flux:select></div>
         </div>
+
     <div id="limits" class="p-5 mb-5">
         <flux:card>
             @if ($this->tasks->isNotEmpty())
@@ -75,11 +84,8 @@
                                     label="Due Date" 
                                     wire:model="due" 
                                     class="mt-2" 
-                                    error="{{ $errors->first('due') }}"
                                 />
-                                @error('due')
-                                        {{ $message }}
-                                @enderror
+  
                             </flux:table.cell>
                             <flux:table.cell>
                                 <flux:select label="Priority" wire:model="priority" class="mt-2">
