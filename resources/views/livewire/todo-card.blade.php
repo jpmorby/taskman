@@ -3,7 +3,7 @@
     <flux:table.columns>
         <flux:table.column class="w-1/12" sortable :sorted="$sortBy === 'completed'" :direction="$sortDirection"
             wire:click="sort('completed')">
-            <flux:icon.adjustments-vertical />
+            <flux:icon.bars-3-bottom-right />
             &nbsp;
         </flux:table.column>
         <flux:table.column class="w-2/12" sortable :sorted="$sortBy === 'title'" :direction="$sortDirection"
@@ -30,26 +30,26 @@
         
         <flux:table.rows>
             @foreach($this->tasks as $task)
-                <flux:table.row :wire:key="$task->id" wire:click="edit({{ $task->id }})">
+                <flux:table.row :wire:key="$task->id">
                     <flux:table.cell>
                         <flux:checkbox :checked="$task->completed" wire:click="toggleCompleted({{  $task->id }})" />
                     </flux:table.cell>
 
-                    <flux:table.cell>
+                    <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">
                       <flux:label>{{  Str::limit($task->title, 15) }}</flux:label>
                       </flux:table.cell>
 
-                    <flux:table.cell>
+                    <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">
 
                         {{ Str::limit($task->desc, 30) }}
                     </flux:table.cell>
 
                     {{-- <flux:table.cell>{{ $task->created_at->diffForHumans() }}</flux:table.cell> --}}
 
-                    <flux:table.cell>{{ ($task->due ? $task->due->diffForHumans() : "Not Set")}}
+                    <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">{{ ($task->due ? $task->due->diffForHumans() : "Not Set")}}
   
                     </flux:table.cell>
-                    <flux:table.cell>{{  $task->priority }}</flux:table.cell>
+                    <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">{{  $task->priority }}</flux:table.cell>
 
 
                     <flux:table.cell class="w-2/12">

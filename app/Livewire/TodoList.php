@@ -53,7 +53,7 @@ class TodoList extends Component
     public $sortDirection = 'asc';
 
     // Add this property to your class
-    public string $activeFilter = 'all';
+    public string $activeFilter = 'active';
 
     public function mount()
     {
@@ -277,7 +277,7 @@ class TodoList extends Component
 
     public function showToday()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('due', now())
             ->where( 'completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
@@ -285,7 +285,7 @@ class TodoList extends Component
     }
     public function showThisWeek()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('due', '>=', now()->startOfWeek())
             ->where('due', '<=', now()->endOfWeek())
             ->where( 'completed', false)
@@ -294,7 +294,7 @@ class TodoList extends Component
     }
     public function showThisMonth()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('due', '>=', now()->startOfMonth())
             ->where('due', '<=', now()->endOfMonth())
             ->where('completed', false)
@@ -303,7 +303,7 @@ class TodoList extends Component
     }
     public function showThisYear()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('due', '>=', now()->startOfYear())
             ->where('due', '<=', now()->endOfYear())
             ->where('completed', false)
@@ -312,7 +312,7 @@ class TodoList extends Component
     }
     public function showNext7Days()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('due', '>=', now())
             ->where('due', '<=', now()->addDays(7))
             ->where('completed', false)
@@ -321,7 +321,7 @@ class TodoList extends Component
     }
     public function showNext30Days()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('due', '>=', now())
             ->where('due', '<=', now()->addDays(30))
             ->where('completed', false)
@@ -330,7 +330,7 @@ class TodoList extends Component
     }
     public function showNext90Days()
     {
-        return Auth::user()->tasks()
+        return $this->baseQuery()
             ->where('due', '>=', now())
             ->where('due', '<=', now()->addDays(90))
             ->where('completed', false)
