@@ -50,7 +50,10 @@
                     {{ ($task->due ? $task->due->diffForHumans() : "Not Set")}}
                 </flux:table.cell>
 
-                <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">{{  $task->priority }}
+                <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">
+                    <flux:badge color="{{ $this->badgeColour($task->priority) }}" class="w-full text-center">
+                        {{  $task->priority->label() }}
+                    </flux:badge>
                 </flux:table.cell>
 
 

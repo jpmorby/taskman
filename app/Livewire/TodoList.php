@@ -86,6 +86,24 @@ class TodoList extends Component
 
     }
 
+    public function badgeColour(PriorityLevel $priority)
+    {
+        switch ($priority) {
+            case PriorityLevel::CRITICAL:
+                return 'red';
+            case PriorityLevel::HIGH:
+                return 'orange';
+            case PriorityLevel::MEDIUM:
+                return 'lime';
+            case PriorityLevel::LOW:
+                return 'cyan';
+            case PriorityLevel::NONE:
+                return 'gray';
+            default:
+                return 'pink';
+        }
+    }
+
     public function create()
     {
         if ($this->editItem) {
@@ -185,7 +203,7 @@ class TodoList extends Component
         Task::findOrFail($id)->delete();
 
 
-Flux::toast("Task Successfully Removed", "Success");
+        Flux::toast("Task Successfully Removed", "Success");
 
         $this->dispatch('task-deleted');
 
@@ -201,7 +219,7 @@ Flux::toast("Task Successfully Removed", "Success");
         $task = Task::findOrFail($id);
 
         $task->update([
-            'completed' => ! $task->completed,
+            'completed' => !$task->completed,
         ]);
     }
 
@@ -227,9 +245,9 @@ Flux::toast("Task Successfully Removed", "Success");
     public function getListeners(): array
     {
         return [
-            'task-updated' => '$refresh',
-            'task-created' => '$refresh',
-            'task-deleted' => '$refresh',
+            'task-updated'      => '$refresh',
+            'task-created'      => '$refresh',
+            'task-deleted'      => '$refresh',
             'task-list-refresh' => '$refresh', // Add this line for the import functionality
 
         ];
@@ -241,14 +259,14 @@ Flux::toast("Task Successfully Removed", "Success");
         $query = Auth::user()->tasks()
             ->where(function ($query) {
                 $query->where('title', 'like', '%' . $this->needle . '%')
-                      ->orWhere('desc', 'like', '%' . $this->needle . '%');
+                    ->orWhere('desc', 'like', '%' . $this->needle . '%');
             });
-        
+
         // Add priority filter if one is selected
         if (!empty($this->activePriorityFilter)) {
             $query->where('priority', $this->activePriorityFilter);
         }
-        
+
         return $query;
     }
 
