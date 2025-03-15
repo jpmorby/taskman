@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+        'workos' => [
+        'client_id' => env('WORKOS_CLIENT_ID'),
+        'secret' => env('WORKOS_API_KEY'),
+        'redirect_url' => env('WORKOS_REDIRECT_URL'),
+    ],
 
 ];
