@@ -30,7 +30,7 @@
                             href="{{ route('login') }}"
                             class="inline-block px-5 py-1.5 dark:text-[#EDEDEC] text-[#1b1b18] border border-transparent hover:border-[#19140035] dark:hover:border-[#3E3E3A] rounded-sm text-sm leading-normal"
                         >
-                            Log in
+                            Log in / Sign up
                         </a>
 
                         @if (Route::has('register'))
@@ -47,8 +47,8 @@
         <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
             <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
                 @php
-                    use App\Models\User;
-                    $userCount = User::count();
+use App\Models\User;
+$userCount = User::count();
                 @endphp
                 <flux:table>
                     <flux:table.rows>
