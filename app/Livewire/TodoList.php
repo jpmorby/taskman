@@ -32,14 +32,16 @@ class TodoList extends Component
 
     public array $media;
 
-    #[Rule('date|required')]
+    // #[Rule('date|after_or_equal:today')]
     public $due;
-    
+
     public int $tableLength = 10;
 
     public bool $completed = false;
 
-    public $editItem, $viewItem, $viewTask;
+    public $editItem;
+    public $viewItem;
+    public $viewTask;
 
     public $user_id;
 
@@ -52,7 +54,9 @@ class TodoList extends Component
 
     public $sortDirection = 'asc';
 
-    // Add this property to your class
+    // Change this property to store the active priority filter
+    public $activePriorityFilter = '';
+
     public string $activeFilter = 'active';
 
     public function mount()
@@ -226,13 +230,21 @@ class TodoList extends Component
         ];
     }
 
+    // Modify the baseQuery to include the priority filter
     private function baseQuery()
     {
-        return Auth::user()->tasks()
+        $query = Auth::user()->tasks()
             ->where(function ($query) {
                 $query->where('title', 'like', '%' . $this->needle . '%')
                       ->orWhere('desc', 'like', '%' . $this->needle . '%');
             });
+        
+        // Add priority filter if one is selected
+        if (!empty($this->activePriorityFilter)) {
+            $query->where('priority', $this->activePriorityFilter);
+        }
+        
+        return $query;
     }
 
     public function showAll()
@@ -270,7 +282,7 @@ class TodoList extends Component
     {
         return $this->baseQuery()
             ->where('due', '<', now())
-            ->where('completed', false) 
+            ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -279,7 +291,7 @@ class TodoList extends Component
     {
         return $this->baseQuery()
             ->where('due', now())
-            ->where( 'completed', false)
+            ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -288,7 +300,7 @@ class TodoList extends Component
         return $this->baseQuery()
             ->where('due', '>=', now()->startOfWeek())
             ->where('due', '<=', now()->endOfWeek())
-            ->where( 'completed', false)
+            ->where('completed', false)
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
@@ -338,10 +350,10 @@ class TodoList extends Component
             ->paginate($this->tableLength);
     }
 
+    // Fix the setFilter method - it's currently returning a query but should be setting a property
     public function setFilter(string $filter)
     {
         $this->activeFilter = $filter;
-        // Reset pagination when changing filters
         $this->resetPage();
     }
 
@@ -351,11 +363,28 @@ class TodoList extends Component
         $this->resetPage();
     }
 
-    public function showCard($id) {
+    // Update the activePriorityFilter method
+    public function updatedActivePriorityFilter()
+    {
+        $this->resetPage();
+    }
+
+    public function activePriorityFilter($priority)
+    {
+        $this->priority = $priority;
+        $this->activeFilter = 'active';
+        $this->resetPage();
+    }
+
+
+    public function showCard($id)
+    {
         Log::info("Show Card ($id)");
-        
+
         $this->viewItem = Task::findOrFail($id);
 
+        $this->id = $this->viewItem->id;
+        $this->slug = $this->viewItem->slug;
         $this->title = $this->viewItem->title;
         $this->desc = $this->viewItem->desc;
         $this->due = $this->viewItem->due;
@@ -364,7 +393,8 @@ class TodoList extends Component
         Flux::modal('addTask')->show();
     }
 
-    public function closeTaskWindow() {
+    public function closeTaskWindow()
+    {
         Log::info("Close Task Window");
         $this->viewItem = null;
         $this->editItem = null;

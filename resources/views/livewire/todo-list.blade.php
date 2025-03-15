@@ -57,6 +57,16 @@
         </flux:button>
         <flux:spacer />
         <div class="mr-5">
+            <flux:select wire:model.live="activePriorityFilter" label="Priority">
+                <flux:select.option value="">All</flux:select.option>
+                <flux:select.option value="CRITICAL">Critical</flux:select.option>
+                <flux:select.option value="HIGH">High</flux:select.option>
+                <flux:select.option value="MEDIUM">Medium</flux:select.option>
+                <flux:select.option value="LOW">Low</flux:select.option>
+                <flux:select.option value="NONE">None</flux:select.option>
+            </flux:select>
+        </div>
+        <div class="mr-5">
             <flux:select wire:model.live="tableLength" label="Show">
                 <flux:select.option value="5">5</flux:select.option>
                 <flux:select.option value="10">10</flux:select.option>
@@ -79,7 +89,7 @@
         </flux:card>
 
 
-        <flux:modal name="addTask" class="w-6/12">
+        <flux:modal name="addTask" class="w-6/12" @close="closeTaskWindow()">
 
             <form wire:submit="create">
                 <flux:input label="Title" wire:model="title" class="mb-2" />
@@ -89,9 +99,9 @@
                 <flux:spacer />
                 <flux:table>
                     <flux:table.rows>
-                        <flux:table.row>
+                        <flux:table.row :wire:key="$id ?? null">
                             <flux:table.cell>
-                                <flux:input type="date" max="2999-12-31" label="Due Date" wire:model="due"
+                                <flux:date-picker  label="Due Date" wire:model="due"
                                     class="mt-2" />
 
                             </flux:table.cell>
