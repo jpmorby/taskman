@@ -1,6 +1,6 @@
 # Taskman
 
-![GitHub issues](https://img.shields.io/github/issues/jpmorby/taskman) ![GitHub pull requests](https://img.shields.io/github/issues-pr/jpmorby/taskman) ![GitHub](https://img.shields.io/github/license/jpmorby/taskman) ![GitHub last commit](https://img.shields.io/github/last-commit/jpmorby/taskman) ![Laravel Version](https://img.shields.io/badge/Laravel-11.x-green) ![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue) ![PHPUnit Tests](https://github.com/jpmorby/taskman/actions/workflows/tests.yml/badge.svg)
+![GitHub issues](https://img.shields.io/github/issues/jpmorby/taskman) ![GitHub pull requests](https://img.shields.io/github/issues-pr/jpmorby/taskman) ![GitHub](https://img.shields.io/github/license/jpmorby/taskman) ![GitHub last commit](https://img.shields.io/github/last-commit/jpmorby/taskman) ![Laravel Version](https://img.shields.io/badge/Laravel-11.x-green) ![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue) ![PEST Tests](https://github.com/jpmorby/taskman/actions/workflows/tests.yml/badge.svg)
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/jpmorby/taskman/tests.yml?branch=main)  ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/jpmorby/taskman)
 
 ## Introduction
