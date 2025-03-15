@@ -4,33 +4,47 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Livewire\Features\SupportPagination\HandlesPagination;
-use App\Enums\PriorityLevel;
+use Illuminate\Support\Str;
+use App\Enums\PriorityLevel; // Make sure the namespace is correct
 use Livewire\WithPagination;
 
 class Task extends Model
 {
     use HasFactory, WithPagination;
-    //
 
-    public function casts()
+    protected $fillable = [
+        'title',
+        'desc',
+        'due',
+        'completed_at',
+        'priority',
+        'user_id',
+        'uuid',
+        'completed',
+        'slug'
+    ];
+
+    // Add proper casting for the priority field using the correct namespace
+    protected $casts = [
+        'priority' => PriorityLevel::class,
+        'due' => 'datetime',
+        'completed_at' => 'datetime',
+        'completed' => 'boolean',
+    ];
+
+    // Boot method to automatically generate UUIDs
+    protected static function boot()
     {
-        return [
-            'due'       => 'date',
-            'completed' => 'boolean',
-            'priority'  => PriorityLevel::class,
-
-        ];
+        parent::boot();
+        
+        static::creating(function ($task) {
+            $task->uuid = $task->uuid ?? Str::uuid();
+        });
     }
 
-    // protected $guarded = [];
-    protected $fillable = [
-        "title",
-        "desc",
-        "slug",
-        "user_id",
-        "due",
-        "completed",
-        "priority",
-    ];
+    // Your existing relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

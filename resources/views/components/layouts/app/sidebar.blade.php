@@ -14,8 +14,21 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+<flux:navlist variant="outline">
+    <flux:navlist.group :heading="__('Platform')" class="grid">
+        <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+        
+        <!-- Replace the export/import items with the livewire component -->
+        <div class="px-3 py-2">
+            @livewire('task-backup-manager')
+        </div>
+    </flux:navlist.group>
+</flux:navlist>
+
                 </flux:navlist.group>
             </flux:navlist>
+
+
 
             <flux:spacer />
 
@@ -59,6 +72,9 @@
                             </div>
                         </div>
                     </flux:menu.radio.group>
+
+                    <flux:menu.separator />
+
 
                     <flux:menu.separator />
 
@@ -131,5 +147,8 @@
         {{ $slot }}
 
         @fluxScripts
+
+
+        <flux:toast position="top right" />
     </body>
 </html>

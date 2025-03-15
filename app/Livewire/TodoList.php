@@ -184,6 +184,9 @@ class TodoList extends Component
 
         Task::findOrFail($id)->delete();
 
+
+Flux::toast("Task Successfully Removed", "Success");
+
         $this->dispatch('task-deleted');
 
     }
@@ -227,6 +230,8 @@ class TodoList extends Component
             'task-updated' => '$refresh',
             'task-created' => '$refresh',
             'task-deleted' => '$refresh',
+            'task-list-refresh' => '$refresh', // Add this line for the import functionality
+
         ];
     }
 
