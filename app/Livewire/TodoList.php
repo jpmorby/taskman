@@ -79,7 +79,9 @@ class TodoList extends Component
 
     public function addTask()
     {
-        Log::info('addTask');
+
+Log::debug('addTask');
+
         $this->priority = PriorityLevel::LOW;
 
         Flux::modal('addTask')->show();
@@ -117,7 +119,7 @@ class TodoList extends Component
             }
 
             // If we are editing an existing task, we don't want to create a new one
-            Log::info('create - editItem');
+            Log::debug('create - editItem');
 
             try {
                 Auth::user()->tasks()->findOrFail($this->editItem->id)->update([
@@ -140,7 +142,7 @@ class TodoList extends Component
             return;
         }
 
-        Log::info('create');
+        Log::debug('create');
 
         try {
             // Set slug before validation
@@ -176,7 +178,7 @@ class TodoList extends Component
 
     public function edit($id)
     {
-        Log::info("Edit ($id)");
+        Log::debug("Edit ($id)");
 
         $this->editItem = Task::findOrFail($id);
 
@@ -191,14 +193,14 @@ class TodoList extends Component
     public function update()
     {
         // edit/update an existing task
-        Log::info('update');
+        Log::debug('update');
 
         $this->dispatch('task-updated');
     }
 
     public function delete($id)
     {
-        Log::info("Delete ($id)");
+        Log::debug("Delete ($id)");
 
         Task::findOrFail($id)->delete();
 
@@ -404,7 +406,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
 
     public function showCard($id)
     {
-        Log::info("Show Card ($id)");
+        Log::debug("Show Card ($id)");
 
         $this->viewItem = Task::findOrFail($id);
 
@@ -420,7 +422,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
 
     public function closeTaskWindow()
     {
-        Log::info("Close Task Window");
+        Log::debug("Close Task Window");
         $this->viewItem = null;
         $this->editItem = null;
         Flux::modals()->close();

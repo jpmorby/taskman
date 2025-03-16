@@ -77,7 +77,7 @@ class TaskBackupManager extends Component
             $path = 'exports/' . $filename;
             Storage::put($path, $jsonContent);
 
-            Log::info('User ' . Auth::id() . ' exported ' . $tasks->count() . ' tasks');
+            Log::debug('User ' . Auth::id() . ' exported ' . $tasks->count() . ' tasks');
 
             // Download the file
             return Storage::download($path, $filename, [
@@ -151,9 +151,11 @@ class TaskBackupManager extends Component
 
     public function processImport()
     {
-        Log::info("processImport called");
+
+Log::debug("processImport called");
+
         if ($this->backupData === null) {
-            Log::info('No backup data loaded for import.');
+            Log::debug('No backup data loaded for import.');
             Flux::toast('No backup file loaded.', heading: 'Error', variant: 'danger');
             return;
         }
@@ -209,7 +211,7 @@ class TaskBackupManager extends Component
             }
 
             // Log results
-            Log::info("User {$user->id} imported {$importCount} tasks, updated {$updatedCount}, skipped {$skippedCount}");
+            Log::debug("User {$user->id} imported {$importCount} tasks, updated {$updatedCount}, skipped {$skippedCount}");
 
             // Clean up
             $this->reset(['backupFile', 'backupData', 'duplicateFound', 'potentialDuplicates']);
