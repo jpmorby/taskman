@@ -16,14 +16,20 @@ Using as many FluxUI features as I can to simplify design (as I'm lousy at desig
 - Per user task lists
 - Sortable and filterable
 - Keyboard shortcuts (Cmd-A add, Cmd-K search)
+- Multiple languages (locale) supported with translations for Portugese, Spanish, French, Italian, German and Russian so far (thanks to ChatGPT - if someone wants to tidy them up, please feel free!)
+- Export and import your tasks to a json format
+- Mobile friendly interface
 
 ##### TO DO
 
 - Categories
-- Backups / Export functionality (JSON?)
-- Maybe add Sentry and put a version live on task.me.uk
+- ~~Backups / Export functionality (JSON?)~~
+- ~~Translations~~
+- ~~Responsive / mobile friendly design~~
+- Support for Markdown .. probably using flux:editor
+- Add Sentry and put a version live on task.me.uk ???
 - Reverb for notifications (backup jobs / etc)
-- Add file attachment so you can add docs to the tasks
+- Add file attachments so you can add docs to the tasks
 
 ## License
 
