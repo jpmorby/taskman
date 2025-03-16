@@ -122,5 +122,13 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
-
+    'available_locales' => [
+        'English' => 'en',
+        'Russian' => 'ru',
+        'French'  => 'fr',
+        'Portugese' => 'pt',
+        'Spanish' => 'es',
+        'German' => 'de',
+        'Italian' => 'it'
+    ],
 ];
