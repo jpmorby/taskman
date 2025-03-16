@@ -17,6 +17,7 @@
     clone_repo
     setup_env
     build
+    optimize
     publish
     restart-queues
     backup_old_version
@@ -64,6 +65,12 @@
     echo "Build complete"
 @endtask
 
+@task('optimize')
+    echo "Optimizing ..."
+    cd {{ $temp_dir }}
+    php artisan optimize
+@endtask
+
 @task('publish')
     echo "Publishing"
     cd {{ $working_dir }}
@@ -71,6 +78,7 @@
     mv {{ $temp_dir }} {{ $project_name }}
     echo "Publish Complete"
 @endtask
+
 @task('restart-queues', ['on' => 'workers'])
     {{-- Happens Post Publish --}}
 
