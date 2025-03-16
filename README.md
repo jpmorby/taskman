@@ -14,6 +14,7 @@ Using as many FluxUI features as I can to simplify design (as I'm lousy at desig
 #### Features
 
 - Per user task lists
+- WorkOS authentication / AuthKit so support for SSO via Google, GitHub and Apple, Passkey and more
 - Sortable and filterable
 - Keyboard shortcuts (Cmd-A add, Cmd-K search)
 - Multiple languages (locale) supported with translations for Portugese, Spanish, French, Italian, German and Russian so far (thanks to ChatGPT - if someone wants to tidy them up, please feel free!)
