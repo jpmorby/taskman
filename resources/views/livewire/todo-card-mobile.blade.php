@@ -59,7 +59,7 @@
                             {{ $task->due->diffForHumans() }}
                         </span>
                     @else
-                        <span class="text-zinc-400">{{ __('No due date') }}</span>
+                        <span class="text-zinc-400">{{ __('No Due Date') }}</span>
                     @endif
                 </div>
                 
