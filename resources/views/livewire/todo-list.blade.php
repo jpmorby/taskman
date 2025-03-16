@@ -95,10 +95,10 @@
     <!-- Tasks Content -->
     <flux:card class="mb-6 p-5">
         @if ($this->tasks->isNotEmpty())
-            <div class="lg:block hidden item-center w-full">
+            <div class="xl:block hidden item-center w-full">
                 @include('livewire.todo-card')
             </div>
-            <div class="lg:hidden block item-center w-full">
+            <div class="xl:hidden block item-center w-full">
                 @include('livewire.todo-card-mobile')
             </div>
         @elseif ($activeFilter)
