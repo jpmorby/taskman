@@ -13,10 +13,6 @@
             wire:click="sort('desc')">
             Description
         </flux:table.column>
-        {{-- <flux:table.column class="w-2/12" sortable :sorted="$sortBy === 'created_at'" :direction="$sortDirection"
-            wire:click="sort('created_at')">
-            Created
-        </flux:table.column> --}}
         <flux:table.column class="w-2/12" sortable :sorted="$sortBy === 'due'" :direction="$sortDirection"
             wire:click="sort('due')">
             Due Date
@@ -27,7 +23,7 @@
         </flux:table.column>
     </flux:table.columns>
 
-    
+
     <flux:table.rows>
         @foreach($this->tasks as $task)
             <flux:table.row :wire:key="$task->id">
@@ -35,28 +31,39 @@
                     <flux:checkbox :checked="$task->completed" wire:click="toggleCompleted({{  $task->id }})" />
                 </flux:table.cell>
 
-                <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">
+                <flux:table.cell :wire:key="$task->id">
                     <flux:label>{{  Str::limit($task->title, 20) }}</flux:label>
                 </flux:table.cell>
 
-                <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">
-
-                    {{ Str::limit($task->desc, 40) }}
+                <flux:table.cell :wire:key="$task->id">
+                    <flux:accordion transition variant="reverse">
+                        <flux:accordion.item>
+                            <flux:accordion.heading>
+                                <div class="text-sm text-zinc-600 dark:text-zinc-400">
+                                    {!! Str::limit($task->desc, 50) !!}
+                                </div>
+                            </flux:accordion.heading>
+                            <flux:accordion.content>
+                                <p>{!! Str::markdown($task->desc) !!}</p>
+                            </flux:accordion.content>
+                        </flux:accordion.item>
+                    </flux:accordion>
                 </flux:table.cell>
 
-                {{-- <flux:table.cell>{{ $task->created_at->diffForHumans() }}</flux:table.cell> --}}
 
-                <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">
+                <flux:table.cell :wire:key="$task->id">
                     {{ ($task->due ? $task->due->diffForHumans() : "Not Set")}}
                 </flux:table.cell>
 
-                <flux:table.cell :wire:key="$task->id" wire:click="edit({{ $task->id }})">
+                <flux:table.cell :wire:key="$task->id">
                     <flux:badge color="{{ $this->badgeColour($task->priority) }}" class="w-full text-center">
                         {{  $task->priority->label() }}
                     </flux:badge>
                 </flux:table.cell>
 
-
+                <flux:table.cell :wire:key="$task->id">
+                    <flux:button variant="primary" icon="pencil" wire:click="edit({{ $task->id }})" size="xs" />
+                </flux:table.cell>
                 <flux:table.cell class="w-2/12" x-data="{ confirmDelete: false }">
                     <div x-show="!confirmDelete" class="flex justify-center">
                         <flux:button variant="danger" icon="trash" x-on:click.stop="confirmDelete = true" size="xs" />
@@ -74,5 +81,4 @@
             </flux:table.row>
         @endforeach
     </flux:table.rows>
-    </flux:table>
-    <!-- Mobile Tasks Content -->
+</flux:table>

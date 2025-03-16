@@ -1,7 +1,7 @@
 <div class="space-y-4">
     @foreach($this->tasks as $task)
         <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-4 border border-zinc-200 dark:border-zinc-700" wire:key="{{ $task->id }}">
-            <!-- Task header with checkbox, title, and priority -->
+            {{-- <!-- Task header with checkbox, title, and priority --> --}}
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center space-x-3 flex-1">
                     <flux:checkbox wire:key="{{ $task->id }}"
@@ -10,7 +10,7 @@
                     />
                     <h3 class="font-medium text-sm {{ $task->completed ? 'line-through text-zinc-500' : '' }}"
                         wire:click.stop="edit({{ $task->id }})">
-                        {{ $task->title }}
+                        {!! $task->title !!}
                     </h3>
                 </div>
                 
@@ -18,36 +18,51 @@
                 <div class="flex-shrink-0 overflow:hidden">          
                     @switch($task->priority)
                         @case(\App\Enums\PriorityLevel::CRITICAL)
-                        <flux:badge color="purple">{{ __($task->priority->label()) }}</flux:badge>
+                        <flux:badge color="{{ $this->badgeColour($task->priority) }}">
+                            {{ __($task->priority->label()) }}
+                        </flux:badge>
                             @break
                         @case(\App\Enums\PriorityLevel::HIGH)
-                        <flux:badge color="red">{{ __($task->priority->label()) }}</flux:badge>
+                        <flux:badge color="{{ $this->badgeColour($task->priority) }}">
+                            {{ __($task->priority->label()) }}
+                        </flux:badge>
                             @break
                         @case(\App\Enums\PriorityLevel::MEDIUM)  
-                        <flux:badge color="lime">{{ __($task->priority->label()) }}</flux:badge>
+                        <flux:badge color="{{ $this->badgeColour($task->priority) }}">
+                            {{ __($task->priority->label()) }}
+                        </flux:badge>
                             @break
                         @default
-                        <flux:badge color="cyan">{{ __($task->priority->label()) }}</flux:badge>
+                        <flux:badge color="{{ $this->badgeColour($task->priority) }}">
+                            {{ __($task->priority->label()) }}
+                        </flux:badge>
                     @endswitch
                 </div>
             </div>
             
             <!-- Description - collapsible -->
-            <div x-data="{ expanded: false }" class="mb-3">
-                <p class="text-sm text-zinc-600 dark:text-zinc-400" x-show="expanded">
-                    {{ $task->desc }}
+            <div  class="mb-3">
+                @if(Str::length($task->desc) > 50)
+
+                <flux:accordion transition variant="reverse">
+                    <flux:accordion.item>
+                    <flux:accordion.heading>
+                        <div class="text-sm text-zinc-600 dark:text-zinc-400">
+
+                        {!! Str::limit($task->desc, 50) !!}
+                        </div>
+                        </flux:accordion.heading>
+                    <flux:accordion.content>
+                            {!! Str::markdown($task->desc) !!}
+                    </flux:accordion.content>
+                    </flux:accordion.item>
+                </flux:accordion>
+                @else
+                <p class="text-sm text-zinc-600 dark:text-zinc-400">
+                    {!! Str::markdown($task->desc) !!}
                 </p>
-                <p class="text-sm text-zinc-600 dark:text-zinc-400" x-show="!expanded" x-cloak>
-                    {{ Str::limit($task->desc, 75) }}
-                </p>
-                @if(strlen($task->desc) > 75)
-                    <flux:label 
-                        class="text-xs text-blue-600 dark:text-blue-400 mt-1"
-                        x-on:click="expanded = !expanded"
-                        x-text="expanded ? 'Show less' : 'Show more'"
-                        size="xs"
-                    />
                 @endif
+
             </div>
             
             <!-- Due date and action buttons -->
@@ -84,7 +99,7 @@
                     
                     <!-- Confirmation buttons -->
                     <div x-show="confirmDelete" x-cloak class="flex space-x-1 items-center">
-                        <span class="text-xs text-red-500">{{ __('Delete?') }}</span>
+                        <span class="text-xs text-red-500">{{ __('Delete') }}?</span>
                         <flux:button 
                             variant="danger" 
                             size="xs"
