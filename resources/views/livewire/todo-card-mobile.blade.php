@@ -18,16 +18,16 @@
                 <div class="flex-shrink-0 overflow:hidden">          
                     @switch($task->priority)
                         @case(\App\Enums\PriorityLevel::CRITICAL)
-                        <flux:badge color="purple">{{ $task->priority->label() }}</flux:badge>
+                        <flux:badge color="purple">{{ __($task->priority->label()) }}</flux:badge>
                             @break
                         @case(\App\Enums\PriorityLevel::HIGH)
-                        <flux:badge color="red">{{ $task->priority->label() }}</flux:badge>
+                        <flux:badge color="red">{{ __($task->priority->label()) }}</flux:badge>
                             @break
                         @case(\App\Enums\PriorityLevel::MEDIUM)  
-                        <flux:badge color="lime">{{ $task->priority->label() }}</flux:badge>
+                        <flux:badge color="lime">{{ __($task->priority->label()) }}</flux:badge>
                             @break
                         @default
-                        <flux:badge color="cyan">{{ $task->priority->label() }}</flux:badge>
+                        <flux:badge color="cyan">{{ __($task->priority->label()) }}</flux:badge>
                     @endswitch
                 </div>
             </div>
@@ -59,7 +59,7 @@
                             {{ $task->due->diffForHumans() }}
                         </span>
                     @else
-                        <span class="text-zinc-400">No due date</span>
+                        <span class="text-zinc-400">{{ __('No due date') }}</span>
                     @endif
                 </div>
                 
@@ -84,20 +84,20 @@
                     
                     <!-- Confirmation buttons -->
                     <div x-show="confirmDelete" x-cloak class="flex space-x-1 items-center">
-                        <span class="text-xs text-red-500">Delete?</span>
+                        <span class="text-xs text-red-500">{{ __('Delete?') }}</span>
                         <flux:button 
                             variant="danger" 
                             size="xs"
                             wire:click.stop="delete({{ $task->id }})" 
                         >
-                            Yes
+                            {{ __('Yes') }}
                         </flux:button>
                         <flux:button 
                             variant="ghost" 
                             size="xs"
                             x-on:click.stop="confirmDelete = false" 
                         >
-                            No
+                            {{ __('No') }}
                         </flux:button>
                     </div>
                 </div>
