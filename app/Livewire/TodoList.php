@@ -203,7 +203,9 @@ class TodoList extends Component
         Task::findOrFail($id)->delete();
 
 
-        Flux::toast("Task Successfully Removed", "Success");
+
+Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success');
+
 
         $this->dispatch('task-deleted');
 

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
+use App\Http\Middleware\LanguageMiddleware;
 
 Route::get('/', function () {
     return view('welcome');
@@ -10,6 +11,7 @@ Route::get('/', function () {
 Route::middleware([
     'auth',
     ValidateSessionWithWorkOS::class,
+    LanguageMiddleware::class,
 ])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 });

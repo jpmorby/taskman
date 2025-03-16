@@ -1,6 +1,6 @@
 <div class="space-y-4">
     @foreach($this->tasks as $task)
-        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-4 border border-zinc-200 dark:border-zinc-700" :wire:key="$task->id">
+        <div class="bg-white dark:bg-zinc-800 rounded-lg shadow p-4 border border-zinc-200 dark:border-zinc-700" wire:key="{{ $task->id }}">
             <!-- Task header with checkbox, title, and priority -->
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center space-x-3 flex-1">

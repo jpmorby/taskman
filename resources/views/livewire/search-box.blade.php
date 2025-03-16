@@ -5,7 +5,7 @@
                     document.getElementById('searchInput').focus();
                 }
             })">
-    <flux:input id="searchInput" label="Search: " wire:keydown.meta.k="search" kbd="⌘K" icon="magnifying-glass"
+    <flux:input id="searchInput" label="{{ __('Search') }}: " wire:keydown.meta.k="search" kbd="⌘K" icon="magnifying-glass"
         wire:model.debounce.500ms.live="needle" />
 
 </div>
