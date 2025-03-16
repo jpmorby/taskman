@@ -4,7 +4,7 @@
             <!-- Task header with checkbox, title, and priority -->
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center space-x-3 flex-1">
-                    <flux:checkbox 
+                    <flux:checkbox wire:key="{{ $task->id }}"
                         :checked="$task->completed" 
                         wire:click.stop="toggleCompleted({{ $task->id }})" 
                     />
