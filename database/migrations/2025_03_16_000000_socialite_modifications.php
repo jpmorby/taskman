@@ -12,8 +12,10 @@ return new class () extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('email')->nullable()->change();
-            if (!Schema::hasColumn('users', 'password')) {
+            if (Schema::hasColumn('users', 'password')) {
                 $table->string('password')->nullable()->change();
+            } else {
+                $table->string('password')->nullable()->after('email');
             }
         });
 

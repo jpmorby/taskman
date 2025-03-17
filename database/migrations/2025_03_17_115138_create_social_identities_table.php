@@ -11,9 +11,6 @@ return new class () extends Migration {
     public function up(): void
     {
         Schema::create('social_identities', function (Blueprint $table) {
-
-
-
             $table->increments('id');
             $table->bigInteger('user_id');
             $table->string('provider_name')->nullable();
