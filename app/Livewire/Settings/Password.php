@@ -25,7 +25,7 @@ class Password extends Component
         try {
             $validated = $this->validate([
                 'current_password' => ['required', 'string', 'current_password'],
-                'password' => ['required', 'string', PasswordRule::defaults(), 'confirmed'],
+                'password'         => ['required', 'string', PasswordRule::defaults(), 'confirmed'],
             ]);
         } catch (ValidationException $e) {
             $this->reset('current_password', 'password', 'password_confirmation');
@@ -46,8 +46,11 @@ class Password extends Component
     {
 
         try {
-            \Illuminate\Support\Facades\Password::sendResetLink([ 'email' => Auth::user()->email]);
+            \Illuminate\Support\Facades\Password::sendResetLink(['email' => Auth::user()->email]);
             session()->flash('status', __('A reset link has been sent to your email address.'));
+
+            $this->dispatch('password-reset-sent');
+
         } catch (ValidationException $e) {
             $this->reset('email');
             throw $e;

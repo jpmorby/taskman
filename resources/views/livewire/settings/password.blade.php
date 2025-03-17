@@ -37,11 +37,15 @@
         </form>
     </x-settings.layout>
     @else
-        <x-settings.layout>
-            <form wire:submit="sendPasswordResetLink" class="flex flex-col gap-6">
-                <flux:input type="hidden" wire:model="email" />
-                <flux:button variant="primary" type="submit">Click here to request a password reset email</flux:button>
-            </form>
-        </x-settings.layout>
+                <x-settings.layout>
+        <x-action-message class="me-3" on="password-reset-sent">
+            {{ __('Password reset email sent.') }}
+            {{ $message }}
+        </x-action-message>
+                    <form wire:submit="sendPasswordResetLink" class="flex flex-col gap-6">
+                        <flux:input type="hidden" wire:model="email" />
+                        <flux:button variant="primary" type="submit">Click here to request a password reset email</flux:button>
+                    </form>
+                    </x-settings.layout>
     @endif
 </section>
