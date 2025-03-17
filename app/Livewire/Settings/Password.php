@@ -43,12 +43,10 @@ class Password extends Component
     }
 
     public function sendPasswordResetLink() {
-        $this->validate([
-            'email' => ['required', 'email', 'exists:users,email'],
-        ]);
+
         try {
 
-\Illuminate\Support\Facades\Password::sendResetLink($this->only('email'));
+            \Illuminate\Support\Facades\Password::sendResetLink(Auth::user()->email());
 
         }
         catch (ValidationException $e) {
