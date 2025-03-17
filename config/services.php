@@ -39,5 +39,40 @@ return [
         'secret' => env('WORKOS_API_KEY'),
         'redirect_url' => env('WORKOS_REDIRECT_URL'),
     ],
+    'github' => [
+    'client_id' => env('GITHUB_CLIENT_ID'),
+    'client_secret' => env('GITHUB_CLIENT_SECRET'),
+    'redirect' => 'GITHUB_CALLBACK_URL',
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => 'GOOGLE_CALLBACK_URL',
+    ],
+    'twitter' => [
+        'client_id' => env('TWITTER_CLIENT_ID'),
+        'client_secret' => env('TWITTER_CLIENT_SECRET'),
+        'redirect' => 'TWITTER_CALLBACK_URL',
+    ],
+
+
+    // ADDITIONAL PROVIDERS AT https://socialiteproviders.com/
+
+//     'apple' => [
+//   'client_id' => env('APPLE_CLIENT_ID'),
+//   'client_secret' => env('APPLE_CLIENT_SECRET'),
+//   'redirect' => env('APPLE_REDIRECT_URI')
+// ],
+//     'linkedin' => [
+//         'client_id' => env('LINKEDIN_CLIENT_ID'),
+//         'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+//         'redirect' => env('LINKEDIN_REDIRECT_URI')
+//     ],
+//     'azure' => [
+//         'client_id' => env('AZURE_CLIENT_ID'),
+//         'client_secret' => env('AZURE_CLIENT_SECRET'),
+//         'redirect' => env('AZURE_REDIRECT_URI')
+//     ],
 
 ];

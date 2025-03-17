@@ -10,15 +10,11 @@ return new class () extends Migration {
      */
     public function up(): void
     {
+        Schema::table('users', function (Blueprint $table) {
+            if (! Schema::hasColumn('users', 'avatar')) {
+                $table->text('avatar');
+            }
 
-        Schema::dropIfExists('password_reset_tokens');
-    }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        //
+        });
     }
 };

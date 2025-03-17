@@ -67,4 +67,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Task::class);
     }
+
+
+public function identities() {
+   return $this->hasMany('App\SocialIdentity');
+}
 }
