@@ -47,7 +47,9 @@ class Password extends Component
         try {
 
 
-\Illuminate\Support\Facades\Password::sendResetLink(Auth::user()->email);
+
+\Illuminate\Support\Facades\Password::sendResetLink([ 'email' => Auth::user()->email]);
+
 
 
         }
