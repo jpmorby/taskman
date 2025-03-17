@@ -51,7 +51,10 @@ class Password extends Component
 \Illuminate\Support\Facades\Password::sendResetLink([ 'email' => Auth::user()->email]);
 
 
-
+session()->flash('status', __('A reset link has been sent to your email address.'));
+        } catch (ValidationException $e) {
+            $this->reset('email');
+            throw $e;
         }
         catch (ValidationException $e) {
             $this->reset('email');
