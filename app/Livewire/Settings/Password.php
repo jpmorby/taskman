@@ -42,25 +42,17 @@ class Password extends Component
         $this->dispatch('password-updated');
     }
 
-    public function sendPasswordResetLink() {
+    public function sendPasswordResetLink()
+    {
 
         try {
-
-
-
-\Illuminate\Support\Facades\Password::sendResetLink([ 'email' => Auth::user()->email]);
-
-
-session()->flash('status', __('A reset link has been sent to your email address.'));
+            \Illuminate\Support\Facades\Password::sendResetLink([ 'email' => Auth::user()->email]);
+            session()->flash('status', __('A reset link has been sent to your email address.'));
         } catch (ValidationException $e) {
             $this->reset('email');
             throw $e;
         }
-        catch (ValidationException $e) {
-            $this->reset('email');
-            throw $e;
-        }
     }
-    
+
 
 }
