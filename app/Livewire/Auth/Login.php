@@ -29,6 +29,8 @@ class Login extends Component
 
     public bool $remember = false;
 
+    public string $redirectTo = '/dashboard';
+
     /**
      * Handle an incoming authentication request.
      */
