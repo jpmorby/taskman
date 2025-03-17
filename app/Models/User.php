@@ -11,7 +11,8 @@ use Illuminate\Support\Str;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -55,7 +56,7 @@ class User extends Authenticatable
     {
         return Str::of($this->name)
             ->explode(' ')
-            ->map(fn(string $name) => Str::of($name)->substr(0, 1))
+            ->map(fn (string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
     }
 
@@ -69,9 +70,23 @@ class User extends Authenticatable
     }
 
 
-public function identities() {
+    public function identities()
+    {
 
-return $this->hasMany('App\Models\SocialIdentity');
+        return $this->hasMany('App\Models\SocialIdentity');
 
-}
+    }
+
+    public function hasPassword()
+    {
+        return ! empty($this->password);
+    }
+    public function hasEmail()
+    {
+        return ! empty($this->email);
+    }
+    public function hasAvatar()
+    {
+        return ! empty($this->avatar);
+    }
 }
