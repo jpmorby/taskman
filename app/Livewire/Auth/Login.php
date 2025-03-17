@@ -14,7 +14,9 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
-use Laravel\Socialite\Facades\Socialite;
+
+use Socialite;
+
 
 #[Layout('components.layouts.auth')]
 class Login extends Component
