@@ -77,16 +77,16 @@ class User extends Authenticatable
 
     }
 
-    public function hasPassword()
+    public static function hasPassword()
     {
-        return ! empty($this->password);
+        return ! empty($self->password);
     }
-    public function hasEmail()
+    public static function hasEmail()
     {
-        return ! empty($this->email);
+        return ! empty($self->email);
     }
-    public function hasAvatar()
+    public static function hasAvatar()
     {
-        return ! empty($this->avatar);
+        return ! empty($self->avatar);
     }
 }
