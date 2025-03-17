@@ -21,8 +21,8 @@ Route::middleware('guest')->group(function () {
     Route::get('forgot-password', ForgotPassword::class)->name('password.request');
     Route::get('reset-password/{token}', ResetPassword::class)->name('password.reset');
 
-    
-Route::get('login/{provider}', [Login::class,'redirectToProvider']);
+
+    Route::get('login/{provider}', [Login::class, 'redirectToProvider'])->name('login.socialite');
 Route::get('login/{provider}/callback', [Login::class,'handleProviderCallback']);
 
 });

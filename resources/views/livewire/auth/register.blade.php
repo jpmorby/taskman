@@ -27,13 +27,8 @@
             </flux:button>
         </div>
         <hr>
-        <div class="form-group">
-            <div class="col-md-6 col-md-offset-4">
-                <a href="{{ url('/login/github') }}" class="btn btn-github"><i class="fa fa-github"></i> Github</a>
-                <a href="{{ url('/login/google') }}" class="btn btn-google" class="btn btn-google"><i
-                        class="fa fa-twitter"></i> Google</a>
-            </div>
-        </div>
+@include('livewire.auth.sso-buttons')
+
     </form>
 
     <div class="space-x-1 text-center text-sm text-zinc-600 dark:text-zinc-400">
