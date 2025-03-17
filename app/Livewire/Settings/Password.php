@@ -15,6 +15,7 @@ class Password extends Component
     public string $password = '';
 
     public string $password_confirmation = '';
+    public string $email = '';
 
     /**
      * Update the password for the currently authenticated user.
@@ -40,4 +41,13 @@ class Password extends Component
 
         $this->dispatch('password-updated');
     }
+
+    public function sendPasswordResetLink() {
+        $this->validate([
+            'email' => ['required', 'email', 'exists:users,email'],
+        ]);
+        Password::sendResetLink($this->only('email'));
+    }
+    
+
 }
