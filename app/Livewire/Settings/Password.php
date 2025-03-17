@@ -46,7 +46,13 @@ class Password extends Component
         $this->validate([
             'email' => ['required', 'email', 'exists:users,email'],
         ]);
-        Password::sendResetLink($this->only('email'));
+        try {
+            Password::sendResetLink($this->only('email'));
+        }
+        catch (ValidationException $e) {
+            $this->reset('email');
+            throw $e;
+        }
     }
     
 
