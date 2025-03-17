@@ -16,7 +16,6 @@
                     {{ __('Dashboard') }}
                 </flux:navbar.item>
 
-                @livewire('task-backup-manager')
 
             </flux:navbar>
 

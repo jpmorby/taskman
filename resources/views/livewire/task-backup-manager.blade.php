@@ -1,4 +1,3 @@
-<!-- filepath: /Users/jon/Sites/taskman/resources/views/livewire/task-backup-manager.blade.php -->
 <div>
     <!-- Export Button -->
     <flux:button wire:click="exportTasks" wire:loading.attr="disabled" wire:target="exportTasks" icon="arrow-down-tray"
