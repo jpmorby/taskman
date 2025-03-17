@@ -12,7 +12,7 @@ return new class () extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             if (! Schema::hasColumn('users', 'avatar')) {
-                $table->text('avatar');
+                $table->text('avatar')->nullable();
             }
 
         });
