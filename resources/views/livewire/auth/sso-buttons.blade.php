@@ -1,13 +1,25 @@
 <div class="form-group">
     <div class="col-md-6 col-md-offset-4 text-center">
         @if (Route::has('login.socialite'))
-            <a href="{{ url('/login/github') }}" class="btn btn-github"><i class="fa fa-github"></i> Github</a>
-            |
+            <flux:table>
+                <flux:table.rows>
+                    <flux:table.row>
+                        <flux:table.cell>
+                            <flux:button href="/login/github" icon="github" variant="outline" class="btn btn-github"> Github
+                            </flux:button>
+                        </flux:table.cell>
+                        <flux:table.cell>
+                            <flux:button href="/login/google" icon="google" variant="outline" class="btn btn-google"> Google
+                            </flux:button>
+                        </flux:table.cell>
+                        <flux:table.cell>
+                            <flux:button href="/login/discord" icon="discord" variant="outline" class="btn btn-discord">
+                                Discord</flux:button>
+                        </flux:table.cell>
+                        </flux:row>
+                        </flux:rows>
+            </flux:table>
 
-            <a href="{{ url('/login/google') }}" class="btn btn-google"><i class="fa fa-google"></i> Google</a>
-
-            |
-            <a href="{{ url('/login/discord') }}"><i class="fa-brands fa-discord"></i> Discord</a>
         @endif
     </div>
 </div>
