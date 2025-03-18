@@ -55,6 +55,11 @@ return [
         'client_secret' => env('TWITTER_CLIENT_SECRET'),
         'redirect' => env('TWITTER_CALLBACK_URL'),
     ],
+    'discord'  => [
+        'client_id'     => env('DISCORD_CLIENT_ID'),
+        'client_secret' => env('DISCORD_CLIENT_SECRET'),
+        'redirect'      => env('DISCORD_CALLBACK_URL'),
+    ],
 
 
     // ADDITIONAL PROVIDERS AT https://socialiteproviders.com/
