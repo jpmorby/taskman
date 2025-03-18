@@ -17,8 +17,8 @@
     clone_repo
     setup_env
     build
-    optimize
     publish
+    optimize
     restart-queues
     backup_old_version
 @endstory
@@ -66,8 +66,12 @@
 @endtask
 
 @task('optimize')
+# has to run after the directory is moved
+# to avoid The "/var/www/laravel/taskman-envoy.2025-03-18_09-53-00/resources/views" directory does not exist.
+# and │ View [dashboard] not found. │
+
     echo "Optimizing ..."
-    cd {{ $temp_dir }}
+    cd {{ $project_name }} {{ $project_name }}
     php artisan optimize
 @endtask
 
@@ -85,9 +89,11 @@
     echo "Restarting Queues"
     cd {{ $working_dir }}/{{ $project_name }}
     # php artisan queue:restart
+    # overkill but a simple queue:restart doesn't reload the new code
     sudo /usr/bin/supervisorctl restart all
     echo "Restart Complete"
 @endtask
+
 @task('backup_old_version')
     echo "Doing Backup"
     cd {{ $working_dir }}
