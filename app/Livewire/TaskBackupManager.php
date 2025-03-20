@@ -75,7 +75,7 @@ class TaskBackupManager extends Component
 
             // Ensure exports directory exists and store temporary file
             $path = 'exports/' . $filename;
-            Storage::makeDirectory('exports');
+            Storage::disk('local')->makeDirectory('exports');
             Storage::disk('local')->put($path, $jsonContent);
 
             Log::debug('User ' . Auth::id() . ' exported ' . $tasks->count() . ' tasks');
