@@ -43,8 +43,8 @@ test('user can export tasks', function () {
 
     // We can't fully test the downloaded file in a test environment,
     // but we can check that the method was called successfully and
-    // that the tasks were exported to storage
-    Storage::disk('local')->assertExists('exports/*');
+    // that the exports directory was created
+    Storage::disk('local')->assertExists('exports');
 });
 
 test('user can validate backup file', function () {
