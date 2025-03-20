@@ -80,8 +80,8 @@ class TaskBackupManager extends Component
 
             Log::debug('User ' . Auth::id() . ' exported ' . $tasks->count() . ' tasks');
 
-            // Download the file from local disk
-            return Storage::disk('local')->download($path, $filename, [
+            // Download the file
+            return Storage::download($path, $filename, [
                 'Content-Type' => 'application/json',
                 'Content-Disposition' => 'attachment; filename="' . $filename . '"'
             ]);
