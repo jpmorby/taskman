@@ -1,11 +1,15 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/livewire-starter-kit",
+    "name": "jpmorby/taskman",
     "type": "project",
-    "description": "The official Laravel starter kit for Livewire.",
+    "description": "A task management application built with Laravel and Livewire.",
     "keywords": [
         "laravel",
-        "framework"
+        "livewire",
+        "task",
+        "management",
+        "application",
+        "project"
     ],
     "license": "MIT",
     "require": {
