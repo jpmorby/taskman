@@ -73,14 +73,15 @@ class TaskBackupManager extends Component
             // Generate filename with timestamp
             $filename = 'taskman_backup_' . date('Y-m-d_His') . '.json';
 
-            // Store temporary file
+            // Ensure exports directory exists and store temporary file
             $path = 'exports/' . $filename;
-            Storage::put($path, $jsonContent);
+            Storage::makeDirectory('exports');
+            Storage::disk('local')->put($path, $jsonContent);
 
             Log::debug('User ' . Auth::id() . ' exported ' . $tasks->count() . ' tasks');
 
-            // Download the file
-            return Storage::download($path, $filename, [
+            // Download the file from local disk
+            return Storage::disk('local')->download($path, $filename, [
                 'Content-Type' => 'application/json',
                 'Content-Disposition' => 'attachment; filename="' . $filename . '"'
             ]);
