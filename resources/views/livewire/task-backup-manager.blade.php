@@ -76,7 +76,13 @@
                                             {{ \Carbon\Carbon::parse($duplicate['existing']['updated_at'])->diffForHumans() }}
                                         </td>
                                         <td class="text-sm">
-                                            {{ \Carbon\Carbon::parse($duplicate['imported']['updated_at'] ?? $duplicate['imported']['created_at'])->diffForHumans() }}
+                                            @if(isset($duplicate['imported']['updated_at']))
+                                                {{ \Carbon\Carbon::parse($duplicate['imported']['updated_at'])->diffForHumans() }}
+                                            @elseif(isset($duplicate['imported']['created_at']))
+                                                {{ \Carbon\Carbon::parse($duplicate['imported']['created_at'])->diffForHumans() }}
+                                            @else
+                                                N/A
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
