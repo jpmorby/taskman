@@ -25,7 +25,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // API v1 Routes
-Route::prefix('api/v1')->middleware('auth:sanctum')->group(function () {
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     
     // Get all tasks with optional filtering
     Route::get('/tasks', function (Request $request) {
