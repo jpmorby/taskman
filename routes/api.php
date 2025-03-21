@@ -270,7 +270,6 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         
         $task->update([
             'completed' => !$task->completed,
-            'completed_at' => !$task->completed ? now() : null,
         ]);
         
         return response()->json([
