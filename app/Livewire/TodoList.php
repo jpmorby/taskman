@@ -124,7 +124,7 @@ Log::debug('addTask');
 
             try {
                 Auth::user()->tasks()->findOrFail($this->editItem->id)->update([
-                    'title'    => $this->title,
+                    'title'    => Purify::clean($this->title),
                     'slug'     => Str::of($this->title)->slug(),
                     'desc'     => Purify::clean($this->desc),
                     'due'      => $this->due,
@@ -413,8 +413,8 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
 
         $this->id = $this->viewItem->id;
         $this->slug = $this->viewItem->slug;
-        $this->title = $this->viewItem->title;
-        $this->desc = $this->viewItem->desc;
+        $this->title = Purify::clean($this->viewItem->title);
+        $this->desc = Purify::clean($this->viewItem->desc);
         $this->due = $this->viewItem->due;
         $this->priority = $this->viewItem->priority;
 
