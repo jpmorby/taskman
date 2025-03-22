@@ -23,7 +23,8 @@ Route::middleware('guest')->group(function () {
 
 
     Route::get('login/{provider}', [Login::class, 'redirectToProvider'])->name('login.socialite');
-Route::get('login/{provider}/callback', [Login::class,'handleProviderCallback']);
+    // Route::get('login/{provider}/callback', [Login::class, 'handleProviderCallback']);
+    Route::match(['GET', 'POST'], 'login/{provider}/callback', [Login::class, 'handleProviderCallback']);
 
 });
 
