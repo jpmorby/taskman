@@ -60,15 +60,17 @@ return [
         'client_secret' => env('DISCORD_CLIENT_SECRET'),
         'redirect'      => env('DISCORD_CALLBACK_URL'),
     ],
-
+    'apple'    => [
+        'client_id'     => env('APPLE_CLIENT_ID'),
+        'client_secret' => env('APPLE_CLIENT_SECRET'),
+        'team_id'       => env('APPLE_TEAM_ID'),
+        'key_id'        => env('APPLE_KEY_ID'),
+        'redirect'      => env('APPLE_CALLBACK_URL')
+    ],
 
     // ADDITIONAL PROVIDERS AT https://socialiteproviders.com/
 
-//     'apple' => [
-//   'client_id' => env('APPLE_CLIENT_ID'),
-//   'client_secret' => env('APPLE_CLIENT_SECRET'),
-//   'redirect' => env('APPLE_REDIRECT_URI')
-// ],
+
 //     'linkedin' => [
 //         'client_id' => env('LINKEDIN_CLIENT_ID'),
 //         'client_secret' => env('LINKEDIN_CLIENT_SECRET'),

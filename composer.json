@@ -22,7 +22,8 @@
         "livewire/flux": "^2.0",
         "livewire/flux-pro": "^2.0",
         "livewire/volt": "^1.6.7",
-        "martinbean/socialite-discord-provider": "^1.2"
+        "martinbean/socialite-discord-provider": "^1.2",
+        "socialiteproviders/apple": "^5.6"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",
