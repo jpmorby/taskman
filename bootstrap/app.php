@@ -13,7 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append([LanguageMiddleware::class]);
-
+        $middleware->validateCsrfTokens(except: [
+            'login/*/callback'
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
