@@ -14,6 +14,7 @@ use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Enums\PriorityLevel;
+use Stevebauman\Purify\Facades\Purify;
 
 class TodoList extends Component
 {
@@ -125,7 +126,7 @@ Log::debug('addTask');
                 Auth::user()->tasks()->findOrFail($this->editItem->id)->update([
                     'title'    => $this->title,
                     'slug'     => Str::of($this->title)->slug(),
-                    'desc'     => $this->desc,
+                    'desc'     => Purify::clean($this->desc),
                     'due'      => $this->due,
                     'priority' => $this->priority,
                 ]);
@@ -154,9 +155,9 @@ Log::debug('addTask');
 
             Auth::user()->tasks()->create([
                 'user_id'   => Auth::id(),
-                'title'     => $this->title,
+                'title'     => Purify::clean($this->title),
                 'slug'      => $this->slug,
-                'desc'      => $this->desc,
+                'desc'      => Purify::clean($this->desc),
                 'due'       => $this->due,
                 'priority'  => $this->priority,
                 'completed' => false,
@@ -182,8 +183,8 @@ Log::debug('addTask');
 
         $this->editItem = Task::findOrFail($id);
 
-        $this->title = $this->editItem->title;
-        $this->desc = $this->editItem->desc;
+        $this->title = Purify::clean($this->editItem->title);
+        $this->desc = Purify::clean($this->editItem->desc);
         $this->due = $this->editItem->due;
         $this->priority = $this->editItem->priority;
 
