@@ -166,13 +166,13 @@ test('tasks can be filtered by completion status', function () {
     // Test active filter
     $component = Livewire::test(TodoList::class)
         ->call('setFilter', 'active');
-        
+
     expect($component->get('activeFilter'))->toBe('active');
 
     // Test completed filter
     $component = Livewire::test(TodoList::class)
         ->call('setFilter', 'completed');
-        
+
     expect($component->get('activeFilter'))->toBe('completed');
 });
 
@@ -196,7 +196,7 @@ test('tasks can be filtered by priority', function () {
     // Test priority filter
     $component = Livewire::test(TodoList::class)
         ->set('activePriorityFilter', PriorityLevel::HIGH->value);
-        
+
     expect($component->get('activePriorityFilter'))->toBe(PriorityLevel::HIGH->value);
 });
 
@@ -220,13 +220,13 @@ test('tasks can be searched by title or description', function () {
     // Test search by title
     $component = Livewire::test(TodoList::class)
         ->set('needle', 'Meeting');
-        
+
     expect($component->get('needle'))->toBe('Meeting');
 
     // Test search by description
     $component = Livewire::test(TodoList::class)
         ->set('needle', 'milk');
-        
+
     expect($component->get('needle'))->toBe('milk');
 });
 
@@ -237,14 +237,14 @@ test('tasks can be sorted by different columns', function () {
     // Test sorting
     $component = Livewire::test(TodoList::class)
         ->call('sort', 'due');
-        
+
     expect($component->get('sortBy'))->toBe('due');
     expect($component->get('sortDirection'))->toBe('desc'); // Toggle from default 'asc'
-    
+
     // Toggle sort direction again
     $component->call('sort', 'due');
     expect($component->get('sortDirection'))->toBe('asc');
-    
+
     // Sort by a different column
     $component->call('sort', 'title');
     expect($component->get('sortBy'))->toBe('title');
@@ -283,12 +283,12 @@ test('tasks can be filtered by time ranges', function () {
     $component = Livewire::test(TodoList::class)
         ->call('setFilter', 'thisWeek');
     expect($component->get('activeFilter'))->toBe('thisWeek');
-    
+
     // Test next 7 days filter
     $component = Livewire::test(TodoList::class)
         ->call('setFilter', 'next7Days');
     expect($component->get('activeFilter'))->toBe('next7Days');
-    
+
     // Test next 30 days filter
     $component = Livewire::test(TodoList::class)
         ->call('setFilter', 'next30Days');
@@ -299,28 +299,28 @@ test('tasks are associated with the correct user', function () {
     // Create two users with their own tasks
     $user1 = User::factory()->create();
     $user2 = User::factory()->create();
-    
+
     $user1Task = Task::factory()->create([
         'user_id' => $user1->id,
         'title' => 'User 1 Task',
     ]);
-    
+
     $user2Task = Task::factory()->create([
         'user_id' => $user2->id,
         'title' => 'User 2 Task',
     ]);
-    
+
     // Log in as user 1
     $this->actingAs($user1);
-    
+
     // User 1 should see their tasks but not user 2's tasks
     $response = $this->get('/dashboard');
     $response->assertSee('User 1 Task');
     $response->assertDontSee('User 2 Task');
-    
+
     // Log in as user 2
     $this->actingAs($user2);
-    
+
     // User 2 should see their tasks but not user 1's tasks
     $response = $this->get('/dashboard');
     $response->assertSee('User 2 Task');

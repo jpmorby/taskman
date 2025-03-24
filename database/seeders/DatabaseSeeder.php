@@ -17,11 +17,11 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name'              => 'Jon Morby',
-            'email'             => 'jon@redmail.com',
-            'password'          => '$2y$12$AKPwBz1B74ZdjAWMyJ/xd.gk3LwScZOZzEgp1RW8lOVZ7r3Q1Ambe',
+            'name' => 'Jon Morby',
+            'email' => 'jon@redmail.com',
+            'password' => '$2y$12$AKPwBz1B74ZdjAWMyJ/xd.gk3LwScZOZzEgp1RW8lOVZ7r3Q1Ambe',
             'email_verified_at' => now(),
-            'is_admin'          => true
+            'is_admin' => true,
 
         ]);
 

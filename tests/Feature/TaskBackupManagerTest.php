@@ -36,7 +36,7 @@ test('user can export tasks', function () {
     // Create some tasks for this user
     $task1 = Task::factory()->create(['user_id' => $user->id, 'title' => 'Task 1']);
     $task2 = Task::factory()->create(['user_id' => $user->id, 'title' => 'Task 2']);
-    
+
     // Export the tasks
     $component = Livewire::test(TaskBackupManager::class)
         ->call('exportTasks');
@@ -78,7 +78,7 @@ test('user can validate backup file', function () {
                 'priority' => PriorityLevel::HIGH->value,
                 'completed' => false,
             ],
-        ]
+        ],
     ];
 
     $jsonContent = json_encode($backupData);
@@ -106,7 +106,7 @@ test('user cannot validate invalid backup file', function () {
                 'title' => 'Task 1',
                 'desc' => 'Description 1',
             ],
-        ]
+        ],
     ];
 
     $jsonContent = json_encode($backupData);
@@ -142,7 +142,7 @@ test('user can import tasks from backup', function () {
                 'due' => now()->addDays(3)->toIso8601String(),
                 'priority' => PriorityLevel::MEDIUM->value,
                 'completed' => false,
-                'slug' => 'imported-task-1'
+                'slug' => 'imported-task-1',
             ],
             [
                 'uuid' => '123e4567-e89b-12d3-a456-426614174001',
@@ -151,9 +151,9 @@ test('user can import tasks from backup', function () {
                 'due' => now()->addDays(5)->toIso8601String(),
                 'priority' => PriorityLevel::HIGH->value,
                 'completed' => false,
-                'slug' => 'imported-task-2'
+                'slug' => 'imported-task-2',
             ],
-        ]
+        ],
     ];
 
     $jsonContent = json_encode($backupData);
@@ -210,9 +210,9 @@ test('duplicate tasks can be skipped during import', function () {
                 'due' => now()->addDays(3)->toIso8601String(),
                 'priority' => PriorityLevel::MEDIUM->value,
                 'completed' => false,
-                'slug' => 'modified-task'
+                'slug' => 'modified-task',
             ],
-        ]
+        ],
     ];
 
     $jsonContent = json_encode($backupData);
@@ -270,9 +270,9 @@ test('duplicate tasks can be overwritten during import', function () {
                 'due' => now()->addDays(3)->toIso8601String(),
                 'priority' => PriorityLevel::MEDIUM->value,
                 'completed' => false,
-                'slug' => 'modified-task'
+                'slug' => 'modified-task',
             ],
-        ]
+        ],
     ];
 
     $jsonContent = json_encode($backupData);
@@ -330,9 +330,9 @@ test('duplicate tasks can be kept as duplicates during import', function () {
                 'due' => now()->addDays(3)->toIso8601String(),
                 'priority' => PriorityLevel::MEDIUM->value,
                 'completed' => false,
-                'slug' => 'modified-task'
+                'slug' => 'modified-task',
             ],
-        ]
+        ],
     ];
 
     $jsonContent = json_encode($backupData);
@@ -368,9 +368,9 @@ test('duplicate tasks can be kept as duplicates during import', function () {
 test('imported tasks belong to the importing user regardless of original user', function () {
     $user1 = User::factory()->create(['email' => 'user1@example.com']);
     $user2 = User::factory()->create(['email' => 'user2@example.com']);
-    
+
     $this->actingAs($user2); // Log in as user2
-    
+
     // Create backup data with user1's ID
     $backupData = [
         'metadata' => [
@@ -389,21 +389,21 @@ test('imported tasks belong to the importing user regardless of original user', 
                 'priority' => PriorityLevel::MEDIUM->value,
                 'completed' => false,
                 'slug' => 'user-1-task',
-                'user_id' => $user1->id  // Original user_id
+                'user_id' => $user1->id,  // Original user_id
             ],
-        ]
+        ],
     ];
-    
+
     $jsonContent = json_encode($backupData);
     $file = UploadedFile::fake()->createWithContent('backup.json', $jsonContent);
-    
+
     // Simulate the import process as user2
     $component = Livewire::test(TaskBackupManager::class)
         ->set('backupFile', $file)
         ->call('validateBackup')
         ->set('backupData', $backupData)
         ->call('processImport');
-    
+
     // Verify the task was imported but assigned to user2
     $this->assertDatabaseHas('tasks', [
         'title' => 'User 1 Task',
@@ -414,13 +414,13 @@ test('imported tasks belong to the importing user regardless of original user', 
 test('user can cancel import process', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
-    
+
     // Create initial task count
     $initialTaskCount = 3;
     for ($i = 0; $i < $initialTaskCount; $i++) {
         Task::factory()->create(['user_id' => $user->id]);
     }
-    
+
     // Simulate starting the import process
     $backupData = [
         'metadata' => [
@@ -447,26 +447,26 @@ test('user can cancel import process', function () {
                 'priority' => PriorityLevel::HIGH->value,
                 'completed' => false,
             ],
-        ]
+        ],
     ];
-    
+
     $jsonContent = json_encode($backupData);
     $file = UploadedFile::fake()->createWithContent('backup.json', $jsonContent);
-    
+
     // Set up the component with the backup file
     $component = Livewire::test(TaskBackupManager::class)
         ->set('backupFile', $file)
         ->set('backupData', $backupData);
-    
+
     // Cancel the import
     $component->call('cancelImport');
-    
+
     // Verify properties were reset
     expect($component->get('backupFile'))->toBeNull();
     expect($component->get('backupData'))->toBeNull();
     expect($component->get('duplicateFound'))->toBeFalse();
     expect($component->get('potentialDuplicates'))->toBeEmpty();
-    
+
     // Verify no new tasks were added
     expect(Task::where('user_id', $user->id)->count())->toBe($initialTaskCount);
 });

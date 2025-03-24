@@ -54,7 +54,7 @@ test('user can delete their account with correct password', function () {
 
     // Mock the Logout action to prevent actual logout during test
     $logoutMock = Mockery::mock(App\Livewire\Actions\Logout::class);
-    $logoutMock->shouldReceive('__invoke')->andReturn(function() {
+    $logoutMock->shouldReceive('__invoke')->andReturn(function () {
         return Auth::user();
     });
     $this->app->instance(App\Livewire\Actions\Logout::class, $logoutMock);
@@ -79,7 +79,7 @@ test('delete user form redirects to home page after deletion', function () {
 
     // Mock the Logout action to prevent actual logout during test
     $logoutMock = Mockery::mock(App\Livewire\Actions\Logout::class);
-    $logoutMock->shouldReceive('__invoke')->andReturn(function() {
+    $logoutMock->shouldReceive('__invoke')->andReturn(function () {
         return Auth::user();
     });
     $this->app->instance(App\Livewire\Actions\Logout::class, $logoutMock);

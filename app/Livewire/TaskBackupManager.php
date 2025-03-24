@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * (C) Jon Morby 2025.  All Rights Reserved.
  *
@@ -8,15 +7,14 @@
 
 namespace App\Livewire;
 
+use App\Models\Task;
+use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Flux\Flux;
-use App\Models\Task;
-
 
 /*
  * This component is used to manage task backups.
@@ -34,9 +32,13 @@ class TaskBackupManager extends Component
     use WithFileUploads;
 
     public $backupFile;
+
     public $duplicateAction = 'skip'; // Options: 'skip', 'overwrite', 'keep_both'
+
     public $duplicateFound = false;
+
     public $potentialDuplicates = [];
+
     public $backupData = null;
 
     protected $rules = [
@@ -64,21 +66,21 @@ class TaskBackupManager extends Component
                     'user_email' => Auth::user()->email,
                     'task_count' => $tasks->count(),
                 ],
-                'tasks' => $tasks->toArray()
+                'tasks' => $tasks->toArray(),
             ];
 
             // Convert to JSON
             $jsonContent = json_encode($backupData, JSON_PRETTY_PRINT);
 
             // Generate filename with timestamp
-            $filename = 'taskman_backup_' . date('Y-m-d_His') . '.json';
+            $filename = 'taskman_backup_'.date('Y-m-d_His').'.json';
 
             // Ensure exports directory exists and store temporary file
-            $path = 'exports/' . $filename;
+            $path = 'exports/'.$filename;
             Storage::disk('local')->makeDirectory('exports');
             Storage::disk('local')->put($path, $jsonContent);
 
-            Log::debug('User ' . Auth::id() . ' exported ' . $tasks->count() . ' tasks');
+            Log::debug('User '.Auth::id().' exported '.$tasks->count().' tasks');
 
             // In test environment, just return success (don't download)
             if (app()->environment('testing')) {
@@ -89,12 +91,12 @@ class TaskBackupManager extends Component
             // In normal environment, download the file
             return Storage::download($path, $filename, [
                 'Content-Type' => 'application/json',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Task export failed: ' . $e->getMessage());
-            Flux::toast('Failed to export tasks: ' . $e->getMessage(), 
+            Log::error('Task export failed: '.$e->getMessage());
+            Flux::toast('Failed to export tasks: '.$e->getMessage(),
                 heading: 'Failed', variant: 'danger');
         }
     }
@@ -111,8 +113,9 @@ class TaskBackupManager extends Component
             $this->backupData = json_decode($jsonContent, true);
 
             // Validate backup data structure
-            if (!isset($this->backupData['metadata']) || !isset($this->backupData['tasks'])) {
-                Flux::toast('Invalid backup file format.', heading: 'Error', variant:'danger');
+            if (! isset($this->backupData['metadata']) || ! isset($this->backupData['tasks'])) {
+                Flux::toast('Invalid backup file format.', heading: 'Error', variant: 'danger');
+
                 return false;
             }
 
@@ -150,8 +153,9 @@ class TaskBackupManager extends Component
             return true;
 
         } catch (\Exception $e) {
-            Log::error('Failed to validate backup: ' . $e->getMessage());
-            Flux::toast('Error validating backup file: ' . $e->getMessage(), heading: 'Error', variant: 'danger');
+            Log::error('Failed to validate backup: '.$e->getMessage());
+            Flux::toast('Error validating backup file: '.$e->getMessage(), heading: 'Error', variant: 'danger');
+
             return false;
         }
     }
@@ -159,11 +163,12 @@ class TaskBackupManager extends Component
     public function processImport()
     {
 
-Log::debug("processImport called");
+        Log::debug('processImport called');
 
         if ($this->backupData === null) {
             Log::debug('No backup data loaded for import.');
             Flux::toast('No backup file loaded.', heading: 'Error', variant: 'danger');
+
             return;
         }
 
@@ -194,6 +199,7 @@ Log::debug("processImport called");
                     switch ($this->duplicateAction) {
                         case 'skip':
                             $skippedCount++;
+
                             continue 2; // Skip this task
 
                         case 'overwrite':
@@ -241,8 +247,8 @@ Log::debug("processImport called");
             Flux::toast($message, heading: 'Success', variant: 'success');
 
         } catch (\Exception $e) {
-            Log::error('Task import failed: ' . $e->getMessage());
-            Flux::toast('Failed to import tasks: ' . $e->getMessage(), heading: 'Import Failed', variant: 'danger');
+            Log::error('Task import failed: '.$e->getMessage());
+            Flux::toast('Failed to import tasks: '.$e->getMessage(), heading: 'Import Failed', variant: 'danger');
         }
     }
 
@@ -251,6 +257,6 @@ Log::debug("processImport called");
         $this->reset(['backupFile', 'backupData', 'duplicateFound', 'potentialDuplicates']);
         Flux::modal('import-tasks')->close();
         Flux::modal('resolve-duplicates')->close();
-        Flux::toast('Import canceled.', heading: 'Cancelled', variant:'warning');
+        Flux::toast('Import canceled.', heading: 'Cancelled', variant: 'warning');
     }
 }

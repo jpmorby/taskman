@@ -20,10 +20,10 @@ class TaskFactory extends Factory
         $title = fake()->sentence(3);
 
         return [
-            'title'   => $title,
-            'desc'    => fake()->paragraph(),
-            'due'     => fake()->dateTimeBetween('-1 week', '+1 week'),
-            'slug'    => Str::of($title)->slug('-'),
+            'title' => $title,
+            'desc' => fake()->paragraph(),
+            'due' => fake()->dateTimeBetween('-1 week', '+1 week'),
+            'slug' => Str::of($title)->slug('-'),
             'user_id' => 1,
         ];
     }

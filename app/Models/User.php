@@ -46,7 +46,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
+            'password' => 'hashed',
 
         ];
     }
@@ -66,11 +66,11 @@ class User extends Authenticatable
     {
         return $this->is_admin;
     }
+
     public function tasks()
     {
         return $this->hasMany(Task::class);
     }
-
 
     public function identities()
     {
@@ -81,14 +81,16 @@ class User extends Authenticatable
 
     public function hasPassword()
     {
-        return !empty($this->password);
+        return ! empty($this->password);
     }
+
     public function hasEmail()
     {
-        return !empty($this->email);
+        return ! empty($this->email);
     }
+
     public function hasAvatar()
     {
-        return !empty($this->avatar);
+        return ! empty($this->avatar);
     }
 }

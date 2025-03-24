@@ -2,18 +2,17 @@
 
 namespace App\Livewire;
 
+use App\Enums\PriorityLevel;
 use App\Models\Task;
 use Flux\Flux;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Enums\PriorityLevel;
 use Stevebauman\Purify\Facades\Purify;
 
 class TodoList extends Component
@@ -41,7 +40,9 @@ class TodoList extends Component
     public bool $completed = false;
 
     public $editItem;
+
     public $viewItem;
+
     public $viewTask;
 
     public $user_id;
@@ -81,7 +82,7 @@ class TodoList extends Component
     public function addTask()
     {
 
-Log::debug('addTask');
+        Log::debug('addTask');
 
         $this->priority = PriorityLevel::LOW;
 
@@ -115,7 +116,7 @@ Log::debug('addTask');
                 $validated = $this->validate();
             } catch (\Illuminate\Validation\ValidationException $e) {
                 // Log validation errors
-                Log::error('Validation failed: ' . json_encode($e->errors()));
+                Log::error('Validation failed: '.json_encode($e->errors()));
                 throw $e;
             }
 
@@ -124,10 +125,10 @@ Log::debug('addTask');
 
             try {
                 Auth::user()->tasks()->findOrFail($this->editItem->id)->update([
-                    'title'    => Purify::clean($this->title),
-                    'slug'     => Str::of($this->title)->slug(),
-                    'desc'     => Purify::clean($this->desc),
-                    'due'      => $this->due,
+                    'title' => Purify::clean($this->title),
+                    'slug' => Str::of($this->title)->slug(),
+                    'desc' => Purify::clean($this->desc),
+                    'due' => $this->due,
                     'priority' => $this->priority,
                 ]);
 
@@ -136,7 +137,7 @@ Log::debug('addTask');
                 Flux::modal('addTask')->close();
                 $this->dispatch('task-updated');
             } catch (\Exception $e) {
-                Log::error('Update failed: ' . $e->getMessage());
+                Log::error('Update failed: '.$e->getMessage());
                 throw $e;
             }
 
@@ -154,12 +155,12 @@ Log::debug('addTask');
             $validated = $this->validate();
 
             Auth::user()->tasks()->create([
-                'user_id'   => Auth::id(),
-                'title'     => Purify::clean($this->title),
-                'slug'      => $this->slug,
-                'desc'      => Purify::clean($this->desc),
-                'due'       => $this->due,
-                'priority'  => $this->priority,
+                'user_id' => Auth::id(),
+                'title' => Purify::clean($this->title),
+                'slug' => $this->slug,
+                'desc' => Purify::clean($this->desc),
+                'due' => $this->due,
+                'priority' => $this->priority,
                 'completed' => false,
             ]);
 
@@ -168,11 +169,10 @@ Log::debug('addTask');
             $this->dispatch('task-created');
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Log validation errors
-            Log::error('Validation failed: ' . json_encode($e->errors()));
+            Log::error('Validation failed: '.json_encode($e->errors()));
             throw $e;
-
         } catch (\Exception $e) {
-            Log::error('Create task failed: ' . $e->getMessage());
+            Log::error('Create task failed: '.$e->getMessage());
             throw $e;
         }
     }
@@ -205,10 +205,7 @@ Log::debug('addTask');
 
         Task::findOrFail($id)->delete();
 
-
-
-Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success');
-
+        Flux::toast('Task Successfully Removed', heading: 'Success', variant: 'success');
 
         $this->dispatch('task-deleted');
 
@@ -224,7 +221,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
         $task = Task::findOrFail($id);
 
         $task->update([
-            'completed' => !$task->completed,
+            'completed' => ! $task->completed,
         ]);
     }
 
@@ -232,7 +229,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
     public function tasks(): LengthAwarePaginator
     {
         // Get the right method name based on the activeFilter property
-        $methodName = 'show' . ucfirst($this->activeFilter);
+        $methodName = 'show'.ucfirst($this->activeFilter);
 
         // If the method exists, use it, otherwise fall back to showAll
         if (method_exists($this, $methodName)) {
@@ -250,9 +247,9 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
     public function getListeners(): array
     {
         return [
-            'task-updated'      => '$refresh',
-            'task-created'      => '$refresh',
-            'task-deleted'      => '$refresh',
+            'task-updated' => '$refresh',
+            'task-created' => '$refresh',
+            'task-deleted' => '$refresh',
             'task-list-refresh' => '$refresh', // Add this line for the import functionality
 
         ];
@@ -263,12 +260,12 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
     {
         $query = Auth::user()->tasks()
             ->where(function ($query) {
-                $query->where('title', 'like', '%' . $this->needle . '%')
-                    ->orWhere('desc', 'like', '%' . $this->needle . '%');
+                $query->where('title', 'like', '%'.$this->needle.'%')
+                    ->orWhere('desc', 'like', '%'.$this->needle.'%');
             });
 
         // Add priority filter if one is selected
-        if (!empty($this->activePriorityFilter)) {
+        if (! empty($this->activePriorityFilter)) {
             $query->where('priority', $this->activePriorityFilter);
         }
 
@@ -323,6 +320,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showThisWeek()
     {
         return $this->baseQuery()
@@ -332,6 +330,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showThisMonth()
     {
         return $this->baseQuery()
@@ -341,6 +340,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showThisYear()
     {
         return $this->baseQuery()
@@ -350,6 +350,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showNext7Days()
     {
         return $this->baseQuery()
@@ -359,6 +360,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showNext30Days()
     {
         return $this->baseQuery()
@@ -368,6 +370,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
             ->orderBy($this->sortBy, $this->sortDirection)
             ->paginate($this->tableLength);
     }
+
     public function showNext90Days()
     {
         return $this->baseQuery()
@@ -404,7 +407,6 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
         $this->resetPage();
     }
 
-
     public function showCard($id)
     {
         Log::debug("Show Card ($id)");
@@ -422,7 +424,7 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
 
     public function closeTaskWindow()
     {
-        Log::debug("Close Task Window");
+        Log::debug('Close Task Window');
         $this->viewItem = null;
         $this->editItem = null;
         Flux::modals()->close();
@@ -430,5 +432,4 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
         $this->reset(['title', 'desc', 'due', 'priority', 'slug']);
         Flux::modal('addTask')->close();
     }
-
 }

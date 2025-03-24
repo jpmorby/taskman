@@ -15,6 +15,7 @@ class Password extends Component
     public string $password = '';
 
     public string $password_confirmation = '';
+
     public string $email = '';
 
     /**
@@ -25,7 +26,7 @@ class Password extends Component
         try {
             $validated = $this->validate([
                 'current_password' => ['required', 'string', 'current_password'],
-                'password'         => ['required', 'string', PasswordRule::defaults(), 'confirmed'],
+                'password' => ['required', 'string', PasswordRule::defaults(), 'confirmed'],
             ]);
         } catch (ValidationException $e) {
             $this->reset('current_password', 'password', 'password_confirmation');
@@ -56,6 +57,4 @@ class Password extends Component
             throw $e;
         }
     }
-
-
 }

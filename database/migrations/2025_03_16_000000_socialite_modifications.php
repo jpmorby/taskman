@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -20,7 +21,7 @@ return new class () extends Migration {
         });
 
         // Put them back if they were dropped earlier
-        if (!Schema::hasTable('password_reset_tokens')) {
+        if (! Schema::hasTable('password_reset_tokens')) {
             Schema::create('password_reset_tokens', function (Blueprint $table) {
                 $table->string('email')->primary();
                 $table->string('token');

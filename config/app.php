@@ -125,10 +125,10 @@ return [
     'available_locales' => [
         'English' => 'en',
         'Russian' => 'ru',
-        'French'  => 'fr',
+        'French' => 'fr',
         'Portugese' => 'pt',
         'Spanish' => 'es',
         'German' => 'de',
-        'Italian' => 'it'
+        'Italian' => 'it',
     ],
 ];

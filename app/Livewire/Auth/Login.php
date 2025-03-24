@@ -14,9 +14,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
-
 use Socialite;
-
 
 #[Layout('components.layouts.auth')]
 class Login extends Component
@@ -98,14 +96,15 @@ class Login extends Component
 
         $authUser = $this->findOrCreateUser($user, $provider);
         Auth::login($authUser, true);
+
         return redirect($this->redirectTo);
     }
 
     public function findOrCreateUser($providerUser, $provider)
     {
         $account = SocialIdentity::whereProviderName($provider)
-                   ->whereProviderId($providerUser->getId())
-                   ->first();
+            ->whereProviderId($providerUser->getId())
+            ->first();
 
         if ($account) {
             return $account->user;
@@ -115,17 +114,16 @@ class Login extends Component
             if (! $user) {
                 $user = User::create([
                     'email' => $providerUser->getEmail(),
-                    'name'  => $providerUser->getName(),
+                    'name' => $providerUser->getName(),
                 ]);
             }
 
             $user->identities()->create([
-                'provider_id'   => $providerUser->getId(),
+                'provider_id' => $providerUser->getId(),
                 'provider_name' => $provider,
             ]);
 
             return $user;
         }
     }
-
 }

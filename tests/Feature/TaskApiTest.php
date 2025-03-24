@@ -14,9 +14,10 @@ class TaskApiTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private string $token;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +42,7 @@ class TaskApiTest extends TestCase
         ]);
 
         $response = $this->getJson('/api/v1/tasks', [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200)
@@ -72,8 +73,8 @@ class TaskApiTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
-        $response = $this->getJson('/api/v1/tasks/' . $task->id, [
-            'Authorization' => 'Bearer ' . $this->token,
+        $response = $this->getJson('/api/v1/tasks/'.$task->id, [
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200)
@@ -100,8 +101,8 @@ class TaskApiTest extends TestCase
             'user_id' => $otherUser->id,
         ]);
 
-        $response = $this->getJson('/api/v1/tasks/' . $task->id, [
-            'Authorization' => 'Bearer ' . $this->token,
+        $response = $this->getJson('/api/v1/tasks/'.$task->id, [
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(404);
@@ -117,7 +118,7 @@ class TaskApiTest extends TestCase
         ];
 
         $response = $this->postJson('/api/v1/tasks', $taskData, [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(201)
@@ -154,7 +155,7 @@ class TaskApiTest extends TestCase
             'desc' => '',      // Empty
             'priority' => 'not-a-valid-priority',
         ], [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(422)
@@ -173,8 +174,8 @@ class TaskApiTest extends TestCase
             'priority' => PriorityLevel::HIGH->value,
         ];
 
-        $response = $this->putJson('/api/v1/tasks/' . $task->id, $updateData, [
-            'Authorization' => 'Bearer ' . $this->token,
+        $response = $this->putJson('/api/v1/tasks/'.$task->id, $updateData, [
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200)
@@ -199,8 +200,8 @@ class TaskApiTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
-        $response = $this->deleteJson('/api/v1/tasks/' . $task->id, [], [
-            'Authorization' => 'Bearer ' . $this->token,
+        $response = $this->deleteJson('/api/v1/tasks/'.$task->id, [], [
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200)
@@ -220,8 +221,8 @@ class TaskApiTest extends TestCase
             'completed' => false,
         ]);
 
-        $response = $this->patchJson('/api/v1/tasks/' . $task->id . '/toggle-completion', [], [
-            'Authorization' => 'Bearer ' . $this->token,
+        $response = $this->patchJson('/api/v1/tasks/'.$task->id.'/toggle-completion', [], [
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200)
@@ -233,8 +234,8 @@ class TaskApiTest extends TestCase
         ]);
 
         // Toggle again
-        $response = $this->patchJson('/api/v1/tasks/' . $task->id . '/toggle-completion', [], [
-            'Authorization' => 'Bearer ' . $this->token,
+        $response = $this->patchJson('/api/v1/tasks/'.$task->id.'/toggle-completion', [], [
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200)
@@ -262,7 +263,7 @@ class TaskApiTest extends TestCase
 
         // Test completed filter
         $response = $this->getJson('/api/v1/tasks?status=completed', [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200);
@@ -270,7 +271,7 @@ class TaskApiTest extends TestCase
 
         // Test uncompleted filter
         $response = $this->getJson('/api/v1/tasks?status=uncompleted', [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200);
@@ -296,7 +297,7 @@ class TaskApiTest extends TestCase
         ]);
 
         $response = $this->getJson('/api/v1/tasks?search=find', [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200);
@@ -323,7 +324,7 @@ class TaskApiTest extends TestCase
 
         // Test ascending sort
         $response = $this->getJson('/api/v1/tasks?sort_by=due&sort_direction=asc', [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200);
@@ -331,7 +332,7 @@ class TaskApiTest extends TestCase
 
         // Test descending sort
         $response = $this->getJson('/api/v1/tasks?sort_by=due&sort_direction=desc', [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200);
@@ -346,7 +347,7 @@ class TaskApiTest extends TestCase
         ]);
 
         $response = $this->getJson('/api/v1/tasks/export', [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200)
@@ -391,7 +392,7 @@ class TaskApiTest extends TestCase
         ];
 
         $response = $this->postJson('/api/v1/tasks/import', $importData, [
-            'Authorization' => 'Bearer ' . $this->token,
+            'Authorization' => 'Bearer '.$this->token,
         ]);
 
         $response->assertStatus(200)

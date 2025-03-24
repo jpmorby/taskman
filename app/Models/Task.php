@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\PriorityLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use App\Enums\PriorityLevel; // Make sure the namespace is correct
+use Illuminate\Support\Str; // Make sure the namespace is correct
 use Livewire\WithPagination;
 
 class Task extends Model
@@ -21,7 +21,7 @@ class Task extends Model
         'user_id',
         'uuid',
         'completed',
-        'slug'
+        'slug',
     ];
 
     // Add proper casting for the priority field using the correct namespace
@@ -36,7 +36,7 @@ class Task extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($task) {
             $task->uuid = $task->uuid ?? Str::uuid();
         });

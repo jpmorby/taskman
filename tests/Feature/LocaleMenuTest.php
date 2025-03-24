@@ -27,7 +27,7 @@ test('locale menu has correct initial locale', function () {
 test('locale menu uses app locale if session locale is not set', function () {
     // Clear session locale
     Session::forget('locale');
-    
+
     // Set app locale
     $locale = 'es';
     App::setLocale($locale);
@@ -41,12 +41,12 @@ test('setLocale method changes application locale', function () {
     // Initial state
     Session::forget('locale');
     App::setLocale('en');
-    
+
     // Set up component and change locale
     $newLocale = 'de';
     $component = Livewire::test(LocaleMenu::class)
         ->call('setLocale', $newLocale);
-    
+
     // Check that app locale was set
     expect(App::getLocale())->toBe($newLocale);
     expect(Session::get('locale'))->toBe($newLocale);
@@ -54,7 +54,7 @@ test('setLocale method changes application locale', function () {
 
 test('setLocale method dispatches locale-changed event', function () {
     $newLocale = 'it';
-    
+
     Livewire::test(LocaleMenu::class)
         ->call('setLocale', $newLocale)
         ->assertDispatched('locale-changed', $newLocale);
@@ -62,15 +62,15 @@ test('setLocale method dispatches locale-changed event', function () {
 
 test('setLocale method redirects back to referrer', function () {
     $newLocale = 'pt';
-    
+
     // Mock the referrer
     $referrer = 'http://localhost/dashboard';
     $this->withHeaders(['Referer' => $referrer]);
-    
+
     // Call the method with mocked request
     $component = Livewire::test(LocaleMenu::class)
         ->call('setLocale', $newLocale);
-    
+
     // Since we can't assert on the redirect in Livewire test
     // We're checking that no exceptions were thrown and our state was updated
     expect(App::getLocale())->toBe($newLocale);
