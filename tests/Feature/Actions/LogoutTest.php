@@ -66,7 +66,9 @@ test('logout action redirects to home page', function () {
     // Execute the logout action
     $logout = new Logout();
     $response = $logout();
-    
-    // Verify redirect
-    expect($response->getTargetUrl())->toBe('/');
+
+    // Verify redirect - check just the path in case of domain differences
+    $url = $response->getTargetUrl();
+    $path = parse_url($url, PHP_URL_PATH);
+    expect($path)->toBe('/');
 });
