@@ -8,7 +8,7 @@ test('appearance component can be rendered', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    $response = $this->get('/settings');
+    $response = $this->get('/settings/appearance');
     $response->assertStatus(200);
     $response->assertSeeLivewire(Appearance::class);
 });
