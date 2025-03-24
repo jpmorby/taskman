@@ -14,7 +14,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2' # Adjust to match your Laravel version
+          php-version: '8.4' # Adjust to match your Laravel version
           tools: composer
 
       - name: Add Flux Credentials Loaded From ENV

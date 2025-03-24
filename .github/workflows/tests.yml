@@ -52,3 +52,6 @@ jobs:
 
       - name: Run Tests
         run: ./vendor/bin/pest --parallel
+
+      - name: Run Laravel Pint
+        run: ./vendor/bin/pint --test
