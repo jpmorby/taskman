@@ -411,7 +411,6 @@ Flux::toast("Task Successfully Removed", heading: "Success", variant: 'success')
 
         $this->viewItem = Task::findOrFail($id);
 
-        $this->id = $this->viewItem->id;
         $this->slug = $this->viewItem->slug;
         $this->title = Purify::clean($this->viewItem->title);
         $this->desc = Purify::clean($this->viewItem->desc);
