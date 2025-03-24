@@ -2,6 +2,7 @@
 
 use App\Livewire\Settings\DeleteUserForm;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 
