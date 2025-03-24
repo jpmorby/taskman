@@ -107,7 +107,7 @@ class Login extends Component
             ->first();
 
         if ($account) {
-            return $account->user;
+            return $account->user();
         } else {
             $user = User::whereEmail($providerUser->getEmail())->first();
 
