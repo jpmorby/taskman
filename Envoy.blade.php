@@ -71,7 +71,7 @@
 # and │ View [dashboard] not found. │
 
     echo "Optimizing ..."
-    cd {{ $project_name }} {{ $project_name }}
+    cd {{ $working_dir }}/{{ $project_name }} 
     php artisan optimize
 @endtask
 
