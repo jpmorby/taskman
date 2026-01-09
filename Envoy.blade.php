@@ -1,15 +1,16 @@
 @setup
     $project_name = "taskman";
+    $public_html = "/var/www/eb171a0a-65ac-40f1-bb18-5e06a148c113/public_html";
     $repo = "https://github.com/jpmorby/taskman.git";
     ##################################################
-    $working_dir = "/var/www/laravel/";
-    $deploy_user = "www-data";
+    $working_dir = "/var/www/eb171a0a-65ac-40f1-bb18-5e06a148c113/";
+    $deploy_user = "task_me_1";
     $dateflag = date('Y-m-d_H-i-s');
     $temp_dir = $working_dir . '/' . $project_name . '-' . 'envoy' . '.' . $dateflag;
 @endsetup
 
 @servers([
-    'prod' => ["$deploy_user@www-1.redmail.com"],
+    'prod' => ["$deploy_user@web-42.fxrm.com"],
 ])
 
 @story('deploy', ['on' => 'prod'])
@@ -19,7 +20,7 @@
     build
     publish
     optimize
-    restart-queues
+    {{-- restart-queues --}}
     backup_old_version
 @endstory
 
@@ -37,10 +38,10 @@
 
 @task('setup_env')
     cd {{ $working_dir }}
-    cp {{ $project_name }}/.env {{ $temp_dir }}
+    cp {{ $public_html }}/.env {{ $temp_dir }}
 
-    if [ -f "{{ $project_name }}/auth.json" ]; then
-    cp {{ $project_name }}/auth.json {{ $temp_dir }}
+    if [ -f "{{ $public_html }}/auth.json" ]; then
+    cp {{ $public_html }}/auth.json {{ $temp_dir }}
     fi
 
     echo "Cloning complete"
@@ -71,15 +72,15 @@
 # and │ View [dashboard] not found. │
 
     echo "Optimizing ..."
-    cd {{ $working_dir }}/{{ $project_name }} 
+    cd {{ $public_html }} 
     php artisan optimize
 @endtask
 
 @task('publish')
     echo "Publishing"
     cd {{ $working_dir }}
-    mv {{ $project_name }} {{ $project_name }}-backup.{{ $dateflag }}
-    mv {{ $temp_dir }} {{ $project_name }}
+    mv {{ $public_html }} {{ $project_name }}-backup.{{ $dateflag }}
+    mv {{ $temp_dir }} {{ $public_html }}
     echo "Publish Complete"
 @endtask
 
@@ -87,7 +88,7 @@
     {{-- Happens Post Publish --}}
 
     echo "Restarting Queues"
-    cd {{ $working_dir }}/{{ $project_name }}
+    cd {{ $public_html }}
     # php artisan queue:restart
     # overkill but a simple queue:restart doesn't reload the new code
     sudo /usr/bin/supervisorctl restart all
@@ -99,7 +100,7 @@
     cd {{ $working_dir }}
     mkdir -p backups
     tar cfz backups/{{ $project_name }}-{{ $dateflag }}.tgz {{ $project_name }}-backup.{{ $dateflag }}
-    echo rm -rf {{ $project_name }}-backup.{{ $dateflag }}
+    rm -rf {{ $project_name }}-backup.{{ $dateflag }}
     echo "Backup complete"
 @endtask
 
@@ -107,7 +108,7 @@
     echo "Performing Database Backup"
     cd {{ $working_dir }}
     mkdir -p {{ $working_dir }}/backups
-    export $(grep -v '^#' {{ $working_dir }}/{{ $project_name }}/.env | grep ^DB_ | xargs)
+    export $(grep -v '^#' {{ $public_html }}/.env | grep ^DB_ | xargs)
     echo mariadb-dump -u$DB_USERNAME -p$DB_PASSWORD \
     $DB_DATABASE > {{ $working_dir }}/backups/{{ $project_name }}-{{ $dateflag }}.sql
     gzip {{ $working_dir }}/backups/{{ $project_name }}-{{ $dateflag }}.sql
