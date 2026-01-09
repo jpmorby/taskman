@@ -1,10 +1,11 @@
 @setup
     $project_name = "taskman";
+    $working_dir = "/var/www/eb171a0a-65ac-40f1-bb18-5e06a148c113/";
+    $deploy_user = "task_me_1";
     $public_html = "/var/www/eb171a0a-65ac-40f1-bb18-5e06a148c113/public_html";
     $repo = "https://github.com/jpmorby/taskman.git";
     ##################################################
-    $working_dir = "/var/www/eb171a0a-65ac-40f1-bb18-5e06a148c113/";
-    $deploy_user = "task_me_1";
+
     $dateflag = date('Y-m-d_H-i-s');
     $temp_dir = $working_dir . '/' . $project_name . '-' . 'envoy' . '.' . $dateflag;
 @endsetup
