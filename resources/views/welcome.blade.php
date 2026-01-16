@@ -4,12 +4,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Task Manager</title>
+    <title>Task Manager - Simple & Efficient Task Management</title>
+
+    <x-seo-meta
+        title="Simple & Efficient Task Management"
+        description="Task Manager is a simple and efficient task management tool that helps you stay organized and productive. Create, manage, and track your tasks with ease."
+        :canonical="url('/')"
+    />
+
     <x-count-stats />
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-    
+
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://unpkg.com/@heroicons/vue@1.0.6/outline.js"></script>

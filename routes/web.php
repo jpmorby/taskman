@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\LanguageMiddleware;
 use App\Livewire\Auth\ConfirmPassword;
 use App\Livewire\Auth\ForgotPassword;
@@ -35,6 +36,21 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+Route::get('/robots.txt', function () {
+    $content = "User-agent: *\n";
+    $content .= "Allow: /\n";
+    $content .= "Disallow: /dashboard\n";
+    $content .= "Disallow: /settings\n";
+    $content .= "Disallow: /verify-email\n";
+    $content .= "Disallow: /confirm-password\n";
+    $content .= "Disallow: /api/\n\n";
+    $content .= 'Sitemap: '.url('/sitemap.xml')."\n";
+
+    return response($content, 200, ['Content-Type' => 'text/plain']);
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', VerifyEmail::class)
