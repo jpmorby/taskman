@@ -11,7 +11,7 @@
 @endsetup
 
 @servers([
-    'prod' => ["$deploy_user@web-42.fxrm.com"],
+    'prod' => ["$deploy_user@web-47.fxrm.com"],
 ])
 
 @story('deploy', ['on' => 'prod'])
@@ -73,7 +73,7 @@
 # and │ View [dashboard] not found. │
 
     echo "Optimizing ..."
-    cd {{ $public_html }} 
+    cd {{ $public_html }}
     php artisan optimize
 @endtask
 
