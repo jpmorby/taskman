@@ -27,7 +27,7 @@
         "stevebauman/purify": "^6.3"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.15",
+        "barryvdh/laravel-debugbar": "^4.00",
         "beyondcode/laravel-dump-server": "^2.1",
         "fakerphp/faker": "^1.23",
         "larastan/larastan": "^3.0",
