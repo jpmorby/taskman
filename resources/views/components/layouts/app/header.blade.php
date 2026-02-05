@@ -142,5 +142,6 @@
         {{ $slot }}
 
         @fluxScripts
+        <x-analytics />
     </body>
 </html>
