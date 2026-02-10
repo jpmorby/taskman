@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+glab config set host scm.morby.org
+
 set -e
 
 if [ -n "$(git status --porcelain)" ]; then
@@ -32,9 +34,9 @@ claude --dangerously-skip-permissions  "$(cat << 'EOF'
 5. Create a Task for this issue and mark it `in_progress`.
 6. Implement the fix or feature.
 7. Write tests if applicable.  Make them pass.
-8. Run `composer run format:dirty` to format code.
+8. Run `vendor/bin/pint --dirty` to format code.
 9. Run `vendor/bin/pest --parallel` to confirm the full test suite passes.
-10. If tests fail, attempt to fix.  After 3 failed attemps, mark the task `stuck`, create `.jarvis-stuck` containing the issue number and 
+10. If tests fail, attempt to fix.  After 3 failed attemps, mark the task `stuck`, create `.jarvis-stuck` containing the issue number and
 11. Commit with message format: `ISSUE: #<issue-number>: <short-description>`.
 12. Mark the Task as `completed`.
 EOF
