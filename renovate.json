@@ -1,0 +1,45 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 5am on monday"]
+  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "matchManagers": ["composer"],
+      "postUpdateOptions": ["composerDedupe"]
+    },
+    {
+      "description": "Group Laravel packages together",
+      "matchPackagePatterns": ["^laravel/"],
+      "groupName": "Laravel packages"
+    },
+    {
+      "description": "Group Livewire packages together",
+      "matchPackagePatterns": ["^livewire/"],
+      "groupName": "Livewire packages"
+    },
+    {
+      "description": "Group Pest packages together",
+      "matchPackagePatterns": ["^pestphp/"],
+      "groupName": "Pest packages"
+    },
+    {
+      "description": "Group Tailwind packages together",
+      "matchPackagePatterns": ["tailwindcss"],
+      "groupName": "Tailwind CSS"
+    }
+  ],
+  "postUpdateOptions": [
+    "npmDedupe"
+  ]
+}
