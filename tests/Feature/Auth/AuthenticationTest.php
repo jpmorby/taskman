@@ -1,9 +1,11 @@
 <?php
 
+use App\Livewire\Auth\Login;
 use App\Models\User;
-use Livewire\Volt\Volt as LivewireVolt;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 test('login screen can be rendered', function () {
     $response = $this->get('/login');
@@ -14,7 +16,7 @@ test('login screen can be rendered', function () {
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 
-    $response = LivewireVolt::test('auth.login')
+    $response = Livewire::test(Login::class)
         ->set('email', $user->email)
         ->set('password', 'password')
         ->call('login');
