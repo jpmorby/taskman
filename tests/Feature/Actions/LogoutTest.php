@@ -2,6 +2,7 @@
 
 use App\Livewire\Actions\Logout;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -68,7 +69,7 @@ test('logout action returns a redirect response', function () {
     $response = $logout();
 
     // Verify it's a redirect response
-    expect($response)->toBeInstanceOf(\Illuminate\Http\RedirectResponse::class);
+    expect($response)->toBeInstanceOf(RedirectResponse::class);
 
     // The specific URL may be environment-dependent, so we just check
     // that we got a RedirectResponse rather than the exact URL

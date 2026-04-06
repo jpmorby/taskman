@@ -9,6 +9,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
@@ -114,7 +115,7 @@ class TodoList extends Component
             // Validate with explicit error catching
             try {
                 $validated = $this->validate();
-            } catch (\Illuminate\Validation\ValidationException $e) {
+            } catch (ValidationException $e) {
                 // Log validation errors
                 Log::error('Validation failed: '.json_encode($e->errors()));
                 throw $e;
@@ -167,7 +168,7 @@ class TodoList extends Component
             $this->reset(['title', 'desc', 'due', 'priority', 'slug']);
             Flux::modal('addTask')->close();
             $this->dispatch('task-created');
-        } catch (\Illuminate\Validation\ValidationException $e) {
+        } catch (ValidationException $e) {
             // Log validation errors
             Log::error('Validation failed: '.json_encode($e->errors()));
             throw $e;

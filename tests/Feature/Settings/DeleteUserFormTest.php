@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Actions\Logout;
 use App\Livewire\Settings\DeleteUserForm;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -53,11 +54,11 @@ test('user can delete their account with correct password', function () {
     ]);
 
     // Mock the Logout action to prevent actual logout during test
-    $logoutMock = Mockery::mock(App\Livewire\Actions\Logout::class);
+    $logoutMock = Mockery::mock(Logout::class);
     $logoutMock->shouldReceive('__invoke')->andReturn(function () {
         return Auth::user();
     });
-    $this->app->instance(App\Livewire\Actions\Logout::class, $logoutMock);
+    $this->app->instance(Logout::class, $logoutMock);
 
     // Delete the user with correct password
     Livewire::test(DeleteUserForm::class)
@@ -78,11 +79,11 @@ test('delete user form redirects to home page after deletion', function () {
     $this->actingAs($user);
 
     // Mock the Logout action to prevent actual logout during test
-    $logoutMock = Mockery::mock(App\Livewire\Actions\Logout::class);
+    $logoutMock = Mockery::mock(Logout::class);
     $logoutMock->shouldReceive('__invoke')->andReturn(function () {
         return Auth::user();
     });
-    $this->app->instance(App\Livewire\Actions\Logout::class, $logoutMock);
+    $this->app->instance(Logout::class, $logoutMock);
 
     // Delete the user and check redirect
     $component = Livewire::test(DeleteUserForm::class)

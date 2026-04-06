@@ -1,12 +1,13 @@
 <?php
 
 use App\Livewire\LocaleMenu;
+use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use Livewire\Livewire;
 
 test('locale menu component can be rendered', function () {
-    $user = \App\Models\User::factory()->create();
+    $user = User::factory()->create();
     $this->actingAs($user);
 
     $response = $this->get('/dashboard');

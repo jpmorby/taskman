@@ -4,10 +4,11 @@ use App\Enums\PriorityLevel;
 use App\Livewire\TodoList;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 test('unauthenticated user cannot access todo list', function () {
     $response = $this->get('/dashboard');
