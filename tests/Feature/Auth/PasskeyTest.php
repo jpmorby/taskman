@@ -26,3 +26,17 @@ it('user can have multiple passkeys', function () {
 
     expect($user->passkeys()->count())->toBe(2);
 });
+
+it('settings/passkeys route requires authentication', function () {
+    $response = $this->get(route('settings.passkeys'));
+
+    $response->assertRedirect(route('login'));
+});
+
+it('authenticated user can access settings/passkeys', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('settings.passkeys'));
+
+    $response->assertOk();
+});
