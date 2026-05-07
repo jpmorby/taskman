@@ -1,12 +1,16 @@
 function base64urlToBuffer(base64url) {
     const padded = base64url.replace(/-/g, '+').replace(/_/g, '/')
-        + '==='.slice((base64url.length % 4) || 4);
+        + '='.repeat((4 - base64url.length % 4) % 4);
     return Uint8Array.from(atob(padded), c => c.charCodeAt(0)).buffer;
 }
 
 function bufferToBase64url(buffer) {
-    return btoa(String.fromCharCode(...new Uint8Array(buffer)))
-        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
 function parseRegistrationOptions(optionsJson) {
