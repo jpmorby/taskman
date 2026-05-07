@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Settings;
 
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Spatie\LaravelPasskeys\Actions\GeneratePasskeyRegisterOptionsAction;
 use Spatie\LaravelPasskeys\Actions\StorePasskeyAction;
@@ -31,6 +33,12 @@ class Passkeys extends Component
     {
         $optionsJson = session()->pull('passkey_register_options');
 
+        if (! $optionsJson) {
+            $this->addError('passkeys', __('Registration session expired. Please try again.'));
+
+            return;
+        }
+
         app(StorePasskeyAction::class)->execute(
             auth()->user(),
             json_encode($credential),
@@ -55,20 +63,22 @@ class Passkeys extends Component
 
     public function removePasskey(int $id): void
     {
-        $passkey = auth()->user()->passkeys()->findOrFail($id);
+        DB::transaction(function () use ($id) {
+            $passkey = auth()->user()->passkeys()->lockForUpdate()->findOrFail($id);
 
-        if (auth()->user()->passkeys()->count() === 1 && ! auth()->user()->hasPassword()) {
-            $this->addError('passkeys', __('You cannot remove your only passkey without a password set.'));
+            if (auth()->user()->passkeys()->count() === 1 && ! auth()->user()->hasPassword()) {
+                $this->addError('passkeys', __('You cannot remove your only passkey without a password set.'));
 
-            return;
-        }
+                return;
+            }
 
-        $passkey->delete();
-        $this->confirmingDeleteId = null;
-        $this->loadPasskeys();
+            $passkey->delete();
+            $this->confirmingDeleteId = null;
+            $this->loadPasskeys();
+        });
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.settings.passkeys');
     }
