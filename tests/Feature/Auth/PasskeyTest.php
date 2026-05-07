@@ -121,3 +121,52 @@ it('allows deletion of one of multiple passkeys even with no password', function
 
     expect(Passkey::find($passkey1->id))->toBeNull();
 });
+
+use App\Livewire\Auth\Login;
+use Illuminate\Support\Facades\Auth;
+use Spatie\LaravelPasskeys\Actions\FindPasskeyToAuthenticateAction;
+use Spatie\LaravelPasskeys\Actions\GeneratePasskeyAuthenticationOptionsAction;
+
+it('dispatches passkey-authenticate event when authenticateWithPasskey is called', function () {
+    $mockOptionsJson = '{"challenge":"dGVzdA","allowCredentials":[]}';
+
+    $mock = Mockery::mock(GeneratePasskeyAuthenticationOptionsAction::class);
+    $mock->shouldReceive('execute')->once()->andReturn($mockOptionsJson);
+    app()->instance(GeneratePasskeyAuthenticationOptionsAction::class, $mock);
+
+    Livewire::test(Login::class)
+        ->call('authenticateWithPasskey')
+        ->assertDispatched('passkey-authenticate');
+});
+
+it('logs in user and redirects with valid passkey assertion', function () {
+    $user = User::factory()->create();
+    $passkey = PasskeyFactory::new()->for($user, 'authenticatable')->create(['name' => 'Test Key']);
+    $credential = ['id' => 'cred-id', 'type' => 'public-key'];
+
+    $mock = Mockery::mock(FindPasskeyToAuthenticateAction::class);
+    $mock->shouldReceive('execute')->once()->andReturn($passkey);
+    app()->instance(FindPasskeyToAuthenticateAction::class, $mock);
+
+    session()->put('passkey_auth_options', '{"challenge":"dGVzdA"}');
+
+    Livewire::test(Login::class)
+        ->call('confirmPasskeyAuth', $credential)
+        ->assertRedirect(route('dashboard'));
+
+    expect(Auth::user()->id)->toBe($user->id);
+});
+
+it('shows an error when passkey authentication returns null', function () {
+    $credential = ['id' => 'bad-cred', 'type' => 'public-key'];
+
+    $mock = Mockery::mock(FindPasskeyToAuthenticateAction::class);
+    $mock->shouldReceive('execute')->once()->andReturn(null);
+    app()->instance(FindPasskeyToAuthenticateAction::class, $mock);
+
+    session()->put('passkey_auth_options', '{"challenge":"dGVzdA"}');
+
+    Livewire::test(Login::class)
+        ->call('confirmPasskeyAuth', $credential)
+        ->assertHasErrors(['passkey']);
+});
