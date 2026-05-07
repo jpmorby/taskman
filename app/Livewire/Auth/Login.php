@@ -15,6 +15,8 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Socialite;
+use Spatie\LaravelPasskeys\Actions\FindPasskeyToAuthenticateAction;
+use Spatie\LaravelPasskeys\Actions\GeneratePasskeyAuthenticationOptionsAction;
 
 #[Layout('components.layouts.auth')]
 class Login extends Component
@@ -49,6 +51,39 @@ class Login extends Component
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
+        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+    }
+
+    public function authenticateWithPasskey(): void
+    {
+        $optionsJson = app(GeneratePasskeyAuthenticationOptionsAction::class)->execute();
+        session()->put('passkey_auth_options', $optionsJson);
+        $this->dispatch('passkey-authenticate', options: $optionsJson);
+    }
+
+    public function confirmPasskeyAuth(array $credential): void
+    {
+        $optionsJson = session()->pull('passkey_auth_options');
+
+        if (! $optionsJson) {
+            $this->addError('passkey', __('Authentication session expired. Please try again.'));
+
+            return;
+        }
+
+        $passkey = app(FindPasskeyToAuthenticateAction::class)->execute(
+            json_encode($credential),
+            $optionsJson,
+        );
+
+        if (! $passkey) {
+            $this->addError('passkey', __('The passkey could not be verified. Please try again.'));
+
+            return;
+        }
+
+        Auth::login($passkey->authenticatable);
+        Session::regenerate();
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 

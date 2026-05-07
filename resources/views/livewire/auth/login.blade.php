@@ -1,4 +1,8 @@
-<div class="flex flex-col gap-6">
+<div
+    class="flex flex-col gap-6"
+    x-data="passkeyAuthenticate"
+    @passkey-authenticate.window="authenticate($event.detail.options)"
+>
     <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
 
     <!-- Session Status -->
@@ -27,16 +31,38 @@
         <div class="flex items-center justify-end">
             <flux:button variant="primary" type="submit" class="w-full">{{ __('Log in') }}</flux:button>
         </div>
-        <flux:separator text="or use Single Sign On with" />
-        
-        @include('livewire.auth.sso-buttons')
+    </form>
 
-</form>
+    @error('passkey')
+        <flux:callout variant="danger">{{ $message }}</flux:callout>
+    @enderror
+
+    <template x-if="error">
+        <flux:callout variant="danger" x-text="error"></flux:callout>
+    </template>
+
+    <div class="flex flex-col gap-3">
+        <flux:separator text="{{ __('or') }}" />
+
+        <flux:button
+            variant="outline"
+            class="w-full"
+            wire:click="authenticateWithPasskey"
+        >
+            <flux:icon name="finger-print" class="mr-2 size-5" />
+            {{ __('Sign in with a passkey') }}
+        </flux:button>
+
+        <flux:separator text="{{ __('or use Single Sign On with') }}" />
+
+        @include('livewire.auth.sso-buttons')
+    </div>
+
     <flux:separator />
 
     @if (Route::has('register'))
         <div class="space-x-1 text-center text-sm text-zinc-600 dark:text-zinc-400">
-            {{ __('Don\'t have an account?') }}
+            {{ __("Don't have an account?") }}
             <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
         </div>
     @endif
