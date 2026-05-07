@@ -22,6 +22,7 @@
         "livewire/flux-pro": "^2.0",
         "livewire/livewire": "^4.0",
         "martinbean/socialite-discord-provider": "^1.2",
+        "spatie/laravel-passkeys": "^1.7",
         "stevebauman/purify": "^6.3"
     },
     "require-dev": {
