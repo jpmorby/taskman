@@ -78,3 +78,22 @@ Route::middleware([
 });
 
 require __DIR__.'/auth.php';
+
+// RFC 9116. Served from a route rather than a static file because Expires must
+// always be a future date — a checked-in one lapses silently and researchers are
+// told to treat the whole file as invalid. Rolls on the month so the body is
+// stable day to day.
+Route::get('/.well-known/security.txt', function () {
+    $fields = [
+        'Contact' => 'mailto:security@fxrm.com',
+        'Expires' => now()->addYear()->startOfMonth()->toIso8601ZuluString(),
+        'Preferred-Languages' => 'en',
+        'Canonical' => url('/.well-known/security.txt'),
+    ];
+
+    $body = collect($fields)
+        ->map(fn (string $value, string $field) => "{$field}: {$value}")
+        ->implode("\n")."\n";
+
+    return response($body, 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+})->name('security.txt');
