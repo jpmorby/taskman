@@ -99,5 +99,13 @@
     "Update Password": "Passwort aktualisieren",
     "Password Updated Successfully": "Passwort erfolgreich aktualisiert",
     "Profile Updated Successfully": "Profil erfolgreich aktualisiert",
-    "Platform": "Plattform"
+    "Platform": "Plattform",
+    "Currency": "Währung",
+    "British Pound": "Britisches Pfund",
+    "Euro": "Euro",
+    "US Dollar": "US-Dollar",
+    "Canadian Dollar": "Kanadischer Dollar",
+    "Australian Dollar": "Australischer Dollar",
+    "Swiss Franc": "Schweizer Franken",
+    "Japanese Yen": "Japanischer Yen"
 }

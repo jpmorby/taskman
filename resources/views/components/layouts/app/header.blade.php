@@ -26,6 +26,7 @@
                     <flux:navbar.item class="!h-10 [&>div>svg]:size-5" icon="magnifying-glass" href="#" :label="__('Search')" />
                 </flux:tooltip> --}}
                                 <livewire:locale-menu />
+                <livewire:currency-menu />
 
                 <flux:tooltip :content="__('Repository')" position="bottom">
                     <flux:navbar.item

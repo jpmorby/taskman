@@ -18,6 +18,7 @@ Using as many FluxUI features as I can to simplify design (as I'm lousy at desig
 - Sortable and filterable
 - Keyboard shortcuts (Cmd-A add, Cmd-K search)
 - Multiple languages (locale) supported with translations for Portugese, Spanish, French, Italian, German and Russian so far (thanks to ChatGPT - if someone wants to tidy them up, please feel free!)
+- Currency toggle (GBP, EUR, USD, CAD, AUD, CHF, JPY) which overrides the currency guessed from the locale
 - Export and import your tasks to a json format
 - Mobile friendly interface
 

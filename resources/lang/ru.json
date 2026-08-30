@@ -99,5 +99,13 @@
     "Update Password": "Обновить пароль",
     "Password Updated Successfully": "Пароль успешно обновлен",
     "Profile Updated Successfully": "Профиль успешно обновлен",
-    "Platform": "Платформа"
+    "Platform": "Платформа",
+    "Currency": "Валюта",
+    "British Pound": "Фунт стерлингов",
+    "Euro": "Евро",
+    "US Dollar": "Доллар США",
+    "Canadian Dollar": "Канадский доллар",
+    "Australian Dollar": "Австралийский доллар",
+    "Swiss Franc": "Швейцарский франк",
+    "Japanese Yen": "Японская иена"
 }
