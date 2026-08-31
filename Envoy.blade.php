@@ -53,6 +53,7 @@
     echo "Building ..."
     cd {{ $temp_dir }}
 
+    [ -x /usr/bin/install_nvm_and_node.sh ] && /usr/bin/install_nvm_and_node.sh
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
