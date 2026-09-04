@@ -6,7 +6,9 @@ use App\Enums\PriorityLevel;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use RuntimeException;
 use Tests\TestCase;
 
 class TaskApiTest extends TestCase
@@ -407,5 +409,228 @@ class TaskApiTest extends TestCase
 
         $this->assertEquals(3, $response->json('stats.imported'));
         $this->assertDatabaseCount('tasks', 3);
+    }
+
+    public function test_import_rejects_an_invalid_priority()
+    {
+        $response = $this->postJson('/api/v1/tasks/import', $this->importPayload([
+            $this->importTask(['title' => 'Valid Imported Task']),
+            $this->importTask(['title' => 'Bogus Priority Task', 'priority' => 'BOGUS']),
+        ]), [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['data.tasks.1.priority']);
+
+        // Nothing may be written when any task in the file is rejected
+        $this->assertDatabaseCount('tasks', 0);
+    }
+
+    public function test_import_rejects_a_task_that_is_not_an_array()
+    {
+        $response = $this->postJson('/api/v1/tasks/import', $this->importPayload([
+            'not-a-task',
+        ]), [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['data.tasks.0']);
+
+        $this->assertDatabaseCount('tasks', 0);
+    }
+
+    public function test_import_rejects_a_task_with_a_non_string_uuid()
+    {
+        $response = $this->postJson('/api/v1/tasks/import', $this->importPayload([
+            $this->importTask(['uuid' => ['nested' => 'array']]),
+        ]), [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['data.tasks.0.uuid']);
+
+        $this->assertDatabaseCount('tasks', 0);
+    }
+
+    public function test_import_ignores_attributes_the_backup_file_may_not_set()
+    {
+        $response = $this->postJson('/api/v1/tasks/import', $this->importPayload([
+            $this->importTask([
+                'title' => 'Smuggled Attribute Task',
+                'id' => 999,
+                'user_id' => 12345,
+                'completed_at' => now()->toIso8601String(),
+                'created_at' => now()->subYear()->toIso8601String(),
+            ]),
+        ]), [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(200);
+
+        $task = Task::firstOrFail();
+
+        $this->assertNotEquals(999, $task->id);
+        $this->assertEquals($this->user->id, $task->user_id);
+        $this->assertArrayNotHasKey('completed_at', $task->getAttributes());
+        $this->assertTrue($task->created_at->isToday());
+    }
+
+    public function test_import_is_rolled_back_when_a_task_fails_to_save()
+    {
+        // A failure part way through the file must leave no tasks behind at all
+        Event::listen('eloquent.creating: '.Task::class, function ($task) {
+            if ($task->title === 'Second Imported Task') {
+                throw new RuntimeException('Simulated database failure');
+            }
+        });
+
+        $response = $this->postJson('/api/v1/tasks/import', $this->importPayload([
+            $this->importTask(['title' => 'First Imported Task']),
+            $this->importTask(['title' => 'Second Imported Task']),
+        ]), [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(500);
+        $this->assertDatabaseCount('tasks', 0);
+    }
+
+    public function test_sorting_rejects_an_unknown_column()
+    {
+        Task::factory()->count(2)->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->getJson('/api/v1/tasks?sort_by=nope', [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['sort_by']);
+    }
+
+    public function test_sorting_rejects_an_unknown_direction()
+    {
+        $response = $this->getJson('/api/v1/tasks?sort_by=due&sort_direction=sideways', [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['sort_direction']);
+    }
+
+    public function test_per_page_is_capped()
+    {
+        Task::factory()->count(3)->create([
+            'user_id' => $this->user->id,
+        ]);
+
+        $response = $this->getJson('/api/v1/tasks?per_page=1000000', [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['per_page']);
+
+        $response = $this->getJson('/api/v1/tasks?per_page=0', [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['per_page']);
+
+        // The top of the allowed range is still accepted
+        $response = $this->getJson('/api/v1/tasks?per_page=100', [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(100, $response->json('tasks.per_page'));
+    }
+
+    public function test_a_completed_task_survives_an_export_import_round_trip()
+    {
+        $completed = Task::factory()->create([
+            'user_id' => $this->user->id,
+            'title' => 'A Completed Round Trip Task',
+            'desc' => 'This task was finished before the backup was taken',
+            'priority' => PriorityLevel::HIGH->value,
+            'due' => now()->addDays(4),
+            'completed' => true,
+        ]);
+
+        $export = $this->getJson('/api/v1/tasks/export', [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $export->assertStatus(200);
+
+        // Lose the tasks, then restore the untouched export
+        Task::query()->delete();
+        $this->assertDatabaseCount('tasks', 0);
+
+        $response = $this->postJson('/api/v1/tasks/import', [
+            'data' => $export->json(),
+            'duplicate_action' => 'skip',
+        ], [
+            'Authorization' => 'Bearer '.$this->token,
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(1, $response->json('stats.imported'));
+
+        $restored = $this->user->tasks()->firstOrFail();
+
+        $this->assertEquals($completed->uuid, $restored->uuid);
+        $this->assertEquals($completed->title, $restored->title);
+        $this->assertEquals($completed->desc, $restored->desc);
+        $this->assertEquals($completed->priority, $restored->priority);
+        $this->assertEquals($completed->due->toDateString(), $restored->due->toDateString());
+        $this->assertTrue($restored->completed);
+    }
+
+    /**
+     * A single task as it appears inside a backup file.
+     *
+     * @param  array<string, mixed>  $overrides
+     * @return array<string, mixed>
+     */
+    private function importTask(array $overrides = []): array
+    {
+        return array_merge([
+            'uuid' => Str::uuid()->toString(),
+            'title' => 'An Imported Task',
+            'desc' => 'An imported task description',
+            'priority' => PriorityLevel::MEDIUM->value,
+            'due' => now()->addDays(3)->toIso8601String(),
+            'completed' => false,
+        ], $overrides);
+    }
+
+    /**
+     * A complete import request body wrapping the given tasks.
+     *
+     * @param  array<int, mixed>  $tasks
+     * @return array<string, mixed>
+     */
+    private function importPayload(array $tasks, string $duplicateAction = 'skip'): array
+    {
+        return [
+            'data' => [
+                'metadata' => [
+                    'version' => '1.0',
+                    'created_at' => now()->toIso8601String(),
+                    'user_id' => $this->user->id,
+                    'user_email' => $this->user->email,
+                    'task_count' => count($tasks),
+                ],
+                'tasks' => $tasks,
+            ],
+            'duplicate_action' => $duplicateAction,
+        ];
     }
 }

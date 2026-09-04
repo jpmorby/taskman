@@ -40,11 +40,11 @@
                         <flux:accordion.item>
                             <flux:accordion.heading>
                                 <div class="text-sm text-zinc-600 dark:text-zinc-400">
-                                    {!! Str::limit($task->desc, 50) !!}
+                                    {{ $task->desc_preview }}
                                 </div>
                             </flux:accordion.heading>
                             <flux:accordion.content>
-                                <p>{!! Str::markdown($task->desc) !!}</p>
+                                <p>{!! $task->desc_html !!}</p>
                             </flux:accordion.content>
                         </flux:accordion.item>
                     </flux:accordion>

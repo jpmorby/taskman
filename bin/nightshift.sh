@@ -23,7 +23,7 @@ echo "Working on branch: $BRANCH"
 
 echo "Task list: $CLAUDE_CODE_TASK_LIST_ID"
 
-for ((i=1; i< ITERATIONS; i++)); do
+for ((i=1; i<= ITERATIONS; i++)); do
 echo "== Iteration $i of $ITERATIONS =="
 
 claude --dangerously-skip-permissions  "$(cat << 'EOF'
@@ -36,7 +36,7 @@ claude --dangerously-skip-permissions  "$(cat << 'EOF'
 7. Write tests if applicable.  Make them pass.
 8. Run `vendor/bin/pint --dirty` to format code.
 9. Run `vendor/bin/pest --parallel` to confirm the full test suite passes.
-10. If tests fail, attempt to fix.  After 3 failed attemps, mark the task `stuck`, create `.jarvis-stuck` containing the issue number and
+10. If tests fail, attempt to fix.  After 3 failed attemps, mark the task `stuck`, create `.jarvis-stuck` containing the issue number and a short description of what is blocking you, then stop without committing.
 11. Commit with message format: `ISSUE: #<issue-number>: <short-description>`.
 12. Mark the Task as `completed`.
 EOF

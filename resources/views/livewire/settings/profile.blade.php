@@ -27,6 +27,12 @@
                 @endif
             </div>
 
+            @if (auth()->user()->password !== null)
+                <flux:input wire:model="current_password" :label="__('Current password')" type="password"
+                    autocomplete="current-password"
+                    :description="__('Only required if you are changing your email address.')" />
+            @endif
+
             <div class="flex items-center gap-4">
                 <div class="flex items-center justify-end">
                     <flux:button variant="primary" type="submit" class="w-full">{{ __('Save') }}</flux:button>

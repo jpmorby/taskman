@@ -7,12 +7,14 @@
 
 namespace App\Livewire;
 
-use App\Models\Task;
+use App\Support\TaskImportRules;
 use Flux\Flux;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -75,23 +77,15 @@ class TaskBackupManager extends Component
             // Generate filename with timestamp
             $filename = 'taskman_backup_'.date('Y-m-d_His').'.json';
 
-            // Ensure exports directory exists and store temporary file
-            $path = 'exports/'.$filename;
-            Storage::disk('local')->makeDirectory('exports');
-            Storage::disk('local')->put($path, $jsonContent);
-
             Log::debug('User '.Auth::id().' exported '.$tasks->count().' tasks');
 
-            // In test environment, just return success (don't download)
-            if (app()->environment('testing')) {
-                // Just save the file and return for testing
-                return true;
-            }
-
-            // In normal environment, download the file
-            return Storage::download($path, $filename, [
+            // Stream the backup straight to the browser. Nothing is written to
+            // server storage, so one user's tasks can never be left on disk for
+            // another user (or anyone else) to pick up.
+            return response()->streamDownload(function () use ($jsonContent) {
+                echo $jsonContent;
+            }, $filename, [
                 'Content-Type' => 'application/json',
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             ]);
 
         } catch (\Exception $e) {
@@ -119,6 +113,11 @@ class TaskBackupManager extends Component
                 return false;
             }
 
+            // Check every task in the file before offering to import any of them
+            if ($this->validatedTasks() === null) {
+                return false;
+            }
+
             // Check for potential duplicates by UUID
             $user = Auth::user();
             $existingTaskUuids = $user->tasks()->pluck('uuid')->toArray();
@@ -129,7 +128,7 @@ class TaskBackupManager extends Component
             foreach ($this->backupData['tasks'] as $taskData) {
                 if (isset($taskData['uuid']) && in_array($taskData['uuid'], $existingTaskUuids)) {
                     $hasDuplicates = true;
-                    $existingTask = Task::where('uuid', $taskData['uuid'])->first();
+                    $existingTask = $user->tasks()->where('uuid', $taskData['uuid'])->first();
                     if ($existingTask) {
                         $this->potentialDuplicates[] = [
                             'existing' => $existingTask->toArray(),
@@ -160,6 +159,31 @@ class TaskBackupManager extends Component
         }
     }
 
+    /**
+     * Validate the tasks held in the loaded backup file.
+     *
+     * Returns the validated tasks, or null (having toasted the first problem)
+     * if the file contains a task the application would not otherwise accept.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    protected function validatedTasks(): ?array
+    {
+        try {
+            $validated = Validator::make(
+                ['tasks' => $this->backupData['tasks'] ?? null],
+                TaskImportRules::tasks('tasks')
+            )->validate();
+        } catch (ValidationException $e) {
+            Log::debug('Backup file rejected: '.$e->validator->errors()->first());
+            Flux::toast($e->validator->errors()->first(), heading: 'Invalid backup file', variant: 'danger');
+
+            return null;
+        }
+
+        return $validated['tasks'];
+    }
+
     public function processImport()
     {
 
@@ -172,56 +196,66 @@ class TaskBackupManager extends Component
             return;
         }
 
+        // backupData is a client writable property, so the file contents are
+        // validated again here and not only in validateBackup().
+        $tasks = $this->validatedTasks();
+
+        if ($tasks === null) {
+            return;
+        }
+
+        $this->validate(['duplicateAction' => 'required|in:skip,overwrite,keep_both']);
+
         try {
-            // Import tasks
-            $importCount = 0;
-            $skippedCount = 0;
-            $updatedCount = 0;
             $user = Auth::user();
-            $existingTasksByUuid = $user->tasks()->pluck('id', 'uuid')->toArray();
+            $duplicateAction = $this->duplicateAction;
 
-            foreach ($this->backupData['tasks'] as $taskData) {
-                // Always remove the database ID
-                unset($taskData['id']);
-                unset($taskData['created_at']);
-                unset($taskData['updated_at']);
+            // The whole file imports or none of it does, so a task that fails
+            // to write cannot leave a half finished import behind.
+            [$importCount, $updatedCount, $skippedCount] = DB::transaction(function () use ($user, $tasks, $duplicateAction) {
+                $importCount = 0;
+                $skippedCount = 0;
+                $updatedCount = 0;
+                $existingTasksByUuid = $user->tasks()->pluck('id', 'uuid')->toArray();
 
-                // Ensure the task is assigned to the current user
-                $taskData['user_id'] = $user->id;
+                foreach ($tasks as $taskData) {
+                    // Only the whitelisted attributes are written; user_id comes
+                    // from the relationship, never from the file.
+                    $attributes = TaskImportRules::attributes($taskData);
 
-                // Check for a UUID
-                $uuid = $taskData['uuid'] ?? Str::uuid()->toString();
-                $taskData['uuid'] = $uuid;
+                    $uuid = $taskData['uuid'] ?? Str::uuid()->toString();
 
-                // Check if this UUID already exists in the user's tasks
-                if (array_key_exists($uuid, $existingTasksByUuid)) {
-                    // Handle based on duplicate action
-                    switch ($this->duplicateAction) {
-                        case 'skip':
-                            $skippedCount++;
+                    // Check if this UUID already exists in the user's tasks
+                    if (array_key_exists($uuid, $existingTasksByUuid)) {
+                        switch ($duplicateAction) {
+                            case 'skip':
+                                $skippedCount++;
+                                break;
 
-                            continue 2; // Skip this task
+                            case 'overwrite':
+                                $user->tasks()->findOrFail($existingTasksByUuid[$uuid])->update($attributes);
+                                $updatedCount++;
+                                break;
 
-                        case 'overwrite':
-                            // Update existing task
-                            $existingTask = Task::find($existingTasksByUuid[$uuid]);
-                            $existingTask->update($taskData);
-                            $updatedCount++;
-                            break;
+                            case 'keep_both':
+                                // Create as a new task with a new UUID
+                                $attributes['uuid'] = Str::uuid()->toString();
+                                $user->tasks()->create($attributes);
+                                $importCount++;
+                                break;
+                        }
 
-                        case 'keep_both':
-                            // Create as a new task with a new UUID
-                            $taskData['uuid'] = Str::uuid()->toString();
-                            $user->tasks()->create($taskData);
-                            $importCount++;
-                            break;
+                        continue;
                     }
-                } else {
+
                     // Create new task with the original UUID
-                    $user->tasks()->create($taskData);
+                    $attributes['uuid'] = $uuid;
+                    $existingTasksByUuid[$uuid] = $user->tasks()->create($attributes)->id;
                     $importCount++;
                 }
-            }
+
+                return [$importCount, $updatedCount, $skippedCount];
+            });
 
             // Log results
             Log::debug("User {$user->id} imported {$importCount} tasks, updated {$updatedCount}, skipped {$skippedCount}");

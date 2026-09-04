@@ -22,8 +22,15 @@ Route::middleware('guest')->group(function () {
     Route::get('forgot-password', ForgotPassword::class)->name('password.request');
     Route::get('reset-password/{token}', ResetPassword::class)->name('password.reset');
 
-    Route::get('login/{provider}', [Login::class, 'redirectToProvider'])->name('login.socialite');
-    Route::get('login/{provider}/callback', [Login::class, 'handleProviderCallback']);
+    // Constrained to the providers that are actually wired up, so an unknown slug
+    // 404s instead of reaching Socialite and throwing InvalidArgumentException (500).
+    Route::get('login/{provider}', [Login::class, 'redirectToProvider'])
+        ->whereIn('provider', Login::PROVIDERS)
+        ->name('login.socialite');
+
+    Route::get('login/{provider}/callback', [Login::class, 'handleProviderCallback'])
+        ->whereIn('provider', Login::PROVIDERS)
+        ->name('login.socialite.callback');
 
 });
 

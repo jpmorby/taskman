@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Enums\PriorityLevel;
-use App\Models\Task;
 use Flux\Flux;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -11,10 +10,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Stevebauman\Purify\Facades\Purify;
 
 class TodoList extends Component
 {
@@ -36,6 +35,7 @@ class TodoList extends Component
     // #[Rule('date|after_or_equal:today')]
     public $due;
 
+    #[Locked]
     public int $tableLength = 10;
 
     public bool $completed = false;
@@ -53,8 +53,16 @@ class TodoList extends Component
 
     public $searchResults;
 
+    /**
+     * Columns the table is allowed to sort by. Anything else reaching
+     * orderBy() is a 500, so keep this in step with todo-card.blade.php.
+     */
+    public const SORTABLE_COLUMNS = ['completed', 'title', 'desc', 'due', 'priority'];
+
+    #[Locked]
     public $sortBy = 'due';
 
+    #[Locked]
     public $sortDirection = 'asc';
 
     // Change this property to store the active priority filter
@@ -70,6 +78,10 @@ class TodoList extends Component
 
     public function sort($index)
     {
+        if (! in_array($index, self::SORTABLE_COLUMNS, true)) {
+            return;
+        }
+
         if ($this->sortBy === $index) {
             // If clicking the same column, toggle direction
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -126,9 +138,9 @@ class TodoList extends Component
 
             try {
                 Auth::user()->tasks()->findOrFail($this->editItem->id)->update([
-                    'title' => Purify::clean($this->title),
+                    'title' => $this->title,
                     'slug' => Str::of($this->title)->slug(),
-                    'desc' => Purify::clean($this->desc),
+                    'desc' => $this->desc,
                     'due' => $this->due,
                     'priority' => $this->priority,
                 ]);
@@ -157,9 +169,9 @@ class TodoList extends Component
 
             Auth::user()->tasks()->create([
                 'user_id' => Auth::id(),
-                'title' => Purify::clean($this->title),
+                'title' => $this->title,
                 'slug' => $this->slug,
-                'desc' => Purify::clean($this->desc),
+                'desc' => $this->desc,
                 'due' => $this->due,
                 'priority' => $this->priority,
                 'completed' => false,
@@ -182,10 +194,10 @@ class TodoList extends Component
     {
         Log::debug("Edit ($id)");
 
-        $this->editItem = Task::findOrFail($id);
+        $this->editItem = Auth::user()->tasks()->findOrFail($id);
 
-        $this->title = Purify::clean($this->editItem->title);
-        $this->desc = Purify::clean($this->editItem->desc);
+        $this->title = $this->editItem->title;
+        $this->desc = $this->editItem->desc;
         $this->due = $this->editItem->due;
         $this->priority = $this->editItem->priority;
 
@@ -204,7 +216,7 @@ class TodoList extends Component
     {
         Log::debug("Delete ($id)");
 
-        Task::findOrFail($id)->delete();
+        Auth::user()->tasks()->findOrFail($id)->delete();
 
         Flux::toast('Task Successfully Removed', heading: 'Success', variant: 'success');
 
@@ -219,7 +231,7 @@ class TodoList extends Component
 
     public function toggleCompleted($id)
     {
-        $task = Task::findOrFail($id);
+        $task = Auth::user()->tasks()->findOrFail($id);
 
         $task->update([
             'completed' => ! $task->completed,
@@ -412,11 +424,11 @@ class TodoList extends Component
     {
         Log::debug("Show Card ($id)");
 
-        $this->viewItem = Task::findOrFail($id);
+        $this->viewItem = Auth::user()->tasks()->findOrFail($id);
 
         $this->slug = $this->viewItem->slug;
-        $this->title = Purify::clean($this->viewItem->title);
-        $this->desc = Purify::clean($this->viewItem->desc);
+        $this->title = $this->viewItem->title;
+        $this->desc = $this->viewItem->desc;
         $this->due = $this->viewItem->due;
         $this->priority = $this->viewItem->priority;
 

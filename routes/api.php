@@ -1,8 +1,10 @@
 <?php
 
 use App\Enums\PriorityLevel;
-use App\Models\Task;
+use App\Http\Requests\TaskImportRequest;
+use App\Support\TaskImportRules;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -28,6 +30,14 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 
     // Get all tasks with optional filtering
     Route::get('/tasks', function (Request $request) {
+        // Sorting and pagination are client supplied, so they are whitelisted
+        // rather than handed straight to the query builder.
+        $validated = $request->validate([
+            'sort_by' => ['sometimes', Rule::in(['id', 'title', 'due', 'priority', 'completed', 'created_at', 'updated_at'])],
+            'sort_direction' => ['sometimes', 'in:asc,desc'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+        ]);
+
         $query = $request->user()->tasks();
 
         // Apply search filter
@@ -90,12 +100,12 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         }
 
         // Apply sorting
-        $sortBy = $request->input('sort_by', 'due');
-        $sortDirection = $request->input('sort_direction', 'asc');
+        $sortBy = $validated['sort_by'] ?? 'due';
+        $sortDirection = $validated['sort_direction'] ?? 'asc';
         $query->orderBy($sortBy, $sortDirection);
 
         // Pagination
-        $perPage = $request->input('per_page', 10);
+        $perPage = $validated['per_page'] ?? 10;
 
         return response()->json([
             'tasks' => $query->paginate($perPage),
@@ -123,76 +133,69 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     });
 
     // Import tasks
-    Route::post('/tasks/import', function (Request $request) {
-        $validated = $request->validate([
-            'data' => 'required|array',
-            'data.metadata' => 'required|array',
-            'data.tasks' => 'required|array',
-            'duplicate_action' => 'required|in:skip,overwrite,keep_both',
-        ]);
+    Route::post('/tasks/import', function (TaskImportRequest $request) {
+        $validated = $request->validated();
 
-        $backupData = $validated['data'];
+        $user = $request->user();
         $duplicateAction = $validated['duplicate_action'];
 
-        $importCount = 0;
-        $skippedCount = 0;
-        $updatedCount = 0;
-        $user = $request->user();
-        $existingTasksByUuid = $user->tasks()->pluck('id', 'uuid')->toArray();
+        // The whole file imports or none of it does, so a task that fails to
+        // write cannot leave a half finished import behind.
+        $stats = DB::transaction(function () use ($user, $validated, $duplicateAction) {
+            $importCount = 0;
+            $skippedCount = 0;
+            $updatedCount = 0;
+            $existingTasksByUuid = $user->tasks()->pluck('id', 'uuid')->toArray();
 
-        foreach ($backupData['tasks'] as $taskData) {
-            // Always remove the database ID
-            unset($taskData['id']);
-            unset($taskData['created_at']);
-            unset($taskData['updated_at']);
+            foreach ($validated['data']['tasks'] as $taskData) {
+                // Only the whitelisted attributes are written; user_id comes
+                // from the relationship, never from the file.
+                $attributes = TaskImportRules::attributes($taskData);
 
-            // Ensure the task is assigned to the current user
-            $taskData['user_id'] = $user->id;
+                $uuid = $taskData['uuid'] ?? Str::uuid()->toString();
 
-            // Check for a UUID
-            $uuid = $taskData['uuid'] ?? Str::uuid()->toString();
-            $taskData['uuid'] = $uuid;
+                // Check if this UUID already exists in the user's tasks
+                if (array_key_exists($uuid, $existingTasksByUuid)) {
+                    switch ($duplicateAction) {
+                        case 'skip':
+                            $skippedCount++;
+                            break;
 
-            // Check if this UUID already exists in the user's tasks
-            if (array_key_exists($uuid, $existingTasksByUuid)) {
-                // Handle based on duplicate action
-                switch ($duplicateAction) {
-                    case 'skip':
-                        $skippedCount++;
+                        case 'overwrite':
+                            $user->tasks()->findOrFail($existingTasksByUuid[$uuid])->update($attributes);
+                            $updatedCount++;
+                            break;
 
-                        continue 2; // Skip this task
+                        case 'keep_both':
+                            // Create as a new task with a new UUID
+                            $attributes['uuid'] = Str::uuid()->toString();
+                            $user->tasks()->create($attributes);
+                            $importCount++;
+                            break;
+                    }
 
-                    case 'overwrite':
-                        // Update existing task
-                        $existingTask = Task::find($existingTasksByUuid[$uuid]);
-                        $existingTask->update($taskData);
-                        $updatedCount++;
-                        break;
-
-                    case 'keep_both':
-                        // Create as a new task with a new UUID
-                        $taskData['uuid'] = Str::uuid()->toString();
-                        $user->tasks()->create($taskData);
-                        $importCount++;
-                        break;
+                    continue;
                 }
-            } else {
+
                 // Create new task with the original UUID
-                $user->tasks()->create($taskData);
+                $attributes['uuid'] = $uuid;
+                $existingTasksByUuid[$uuid] = $user->tasks()->create($attributes)->id;
                 $importCount++;
             }
-        }
 
-        // Log results
-        Log::debug("User {$user->id} imported {$importCount} tasks, updated {$updatedCount}, skipped {$skippedCount}");
-
-        return response()->json([
-            'message' => 'Tasks imported successfully',
-            'stats' => [
+            return [
                 'imported' => $importCount,
                 'updated' => $updatedCount,
                 'skipped' => $skippedCount,
-            ],
+            ];
+        });
+
+        // Log results
+        Log::debug("User {$user->id} imported {$stats['imported']} tasks, updated {$stats['updated']}, skipped {$stats['skipped']}");
+
+        return response()->json([
+            'message' => 'Tasks imported successfully',
+            'stats' => $stats,
         ]);
     });
 

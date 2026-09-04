@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
@@ -470,4 +471,171 @@ test('user can cancel import process', function () {
 
     // Verify no new tasks were added
     expect(Task::where('user_id', $user->id)->count())->toBe($initialTaskCount);
+});
+
+test('export streams the backup and writes nothing to server storage', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Task::factory()->create(['user_id' => $user->id, 'title' => 'Task 1']);
+    Task::factory()->create(['user_id' => $user->id, 'title' => 'Task 2']);
+
+    $component = Livewire::test(TaskBackupManager::class)
+        ->call('exportTasks')
+        ->assertFileDownloaded();
+
+    $download = data_get($component->effects, 'download');
+
+    expect($download['name'])->toStartWith('taskman_backup_')->toEndWith('.json');
+    expect($download['contentType'])->toBe('application/json');
+
+    $payload = json_decode(base64_decode($download['content']), true);
+
+    expect($payload['metadata']['user_id'])->toBe($user->id);
+    expect($payload['tasks'])->toHaveCount(2);
+
+    // The backup exists only in the response, never on disk
+    expect(Storage::disk('local')->allFiles())->toBeEmpty();
+    expect(Storage::disk('local')->exists('exports'))->toBeFalse();
+});
+
+test('import rejects a task with an invalid priority', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $backupData = [
+        'metadata' => ['version' => '1.0'],
+        'tasks' => [
+            [
+                'uuid' => '123e4567-e89b-12d3-a456-426614174000',
+                'title' => 'Valid Imported Task',
+                'desc' => 'Description',
+                'priority' => PriorityLevel::MEDIUM->value,
+                'completed' => false,
+            ],
+            [
+                'uuid' => '123e4567-e89b-12d3-a456-426614174001',
+                'title' => 'Bogus Priority Task',
+                'desc' => 'Description',
+                'priority' => 'BOGUS',
+                'completed' => false,
+            ],
+        ],
+    ];
+
+    Livewire::test(TaskBackupManager::class)
+        ->set('backupData', $backupData)
+        ->call('processImport');
+
+    // The whole file is refused, including the task that was fine
+    expect(Task::count())->toBe(0);
+});
+
+test('import rejects a task that is not an array', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Livewire::test(TaskBackupManager::class)
+        ->set('backupData', [
+            'metadata' => ['version' => '1.0'],
+            'tasks' => ['not-a-task'],
+        ])
+        ->call('processImport');
+
+    expect(Task::count())->toBe(0);
+});
+
+test('import ignores attributes the backup file may not set', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+    $this->actingAs($user);
+
+    Livewire::test(TaskBackupManager::class)
+        ->set('backupData', [
+            'metadata' => ['version' => '1.0'],
+            'tasks' => [
+                [
+                    'id' => 999,
+                    'uuid' => '123e4567-e89b-12d3-a456-426614174000',
+                    'title' => 'Smuggled Attribute Task',
+                    'desc' => 'Description',
+                    'priority' => PriorityLevel::MEDIUM->value,
+                    'completed' => false,
+                    'user_id' => $otherUser->id,
+                    'completed_at' => now()->toIso8601String(),
+                    'created_at' => now()->subYear()->toIso8601String(),
+                ],
+            ],
+        ])
+        ->call('processImport');
+
+    $task = Task::firstOrFail();
+
+    expect($task->id)->not->toBe(999);
+    expect($task->user_id)->toBe($user->id);
+    expect($task->getAttributes())->not->toHaveKey('completed_at');
+    expect($task->created_at->isToday())->toBeTrue();
+});
+
+test('import is rolled back when a task fails to save', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    Event::listen('eloquent.creating: '.Task::class, function ($task) {
+        if ($task->title === 'Second Imported Task') {
+            throw new RuntimeException('Simulated database failure');
+        }
+    });
+
+    Livewire::test(TaskBackupManager::class)
+        ->set('backupData', [
+            'metadata' => ['version' => '1.0'],
+            'tasks' => [
+                [
+                    'uuid' => '123e4567-e89b-12d3-a456-426614174000',
+                    'title' => 'First Imported Task',
+                    'desc' => 'Description',
+                    'priority' => PriorityLevel::MEDIUM->value,
+                    'completed' => false,
+                ],
+                [
+                    'uuid' => '123e4567-e89b-12d3-a456-426614174001',
+                    'title' => 'Second Imported Task',
+                    'desc' => 'Description',
+                    'priority' => PriorityLevel::HIGH->value,
+                    'completed' => false,
+                ],
+            ],
+        ])
+        ->call('processImport');
+
+    // A failure part way through must leave no tasks behind at all
+    expect(Task::count())->toBe(0);
+});
+
+test('validating a backup file with an invalid task does not start an import', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $jsonContent = json_encode([
+        'metadata' => ['version' => '1.0'],
+        'tasks' => [
+            [
+                'uuid' => '123e4567-e89b-12d3-a456-426614174000',
+                'title' => 'Bogus Priority Task',
+                'desc' => 'Description',
+                'priority' => 'BOGUS',
+                'completed' => false,
+            ],
+        ],
+    ]);
+
+    $file = UploadedFile::fake()->createWithContent('backup.json', $jsonContent);
+
+    $component = Livewire::test(TaskBackupManager::class)
+        ->set('backupFile', $file)
+        ->call('validateBackup');
+
+    expect($component->get('duplicateFound'))->toBeFalse();
+    expect(Task::count())->toBe(0);
 });
