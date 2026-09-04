@@ -22,6 +22,7 @@ test('profile information can be updated', function () {
     $response = Livewire::test(Profile::class)
         ->set('name', 'Test User')
         ->set('email', 'test@example.com')
+        ->set('current_password', 'password')
         ->call('updateProfileInformation');
 
     $response->assertHasNoErrors();
@@ -77,4 +78,59 @@ test('correct password must be provided to delete account', function () {
     $response->assertHasErrors(['password']);
 
     expect($user->fresh())->not->toBeNull();
+});
+
+test('changing the email address requires the current password', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    Livewire::test(Profile::class)
+        ->set('name', 'Test User')
+        ->set('email', 'attacker@example.com')
+        ->call('updateProfileInformation')
+        ->assertHasErrors(['current_password']);
+
+    expect($user->refresh()->email)->not->toEqual('attacker@example.com');
+});
+
+test('a wrong current password does not change the email address', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    Livewire::test(Profile::class)
+        ->set('email', 'attacker@example.com')
+        ->set('current_password', 'not-the-password')
+        ->call('updateProfileInformation')
+        ->assertHasErrors(['current_password']);
+
+    expect($user->refresh()->email)->not->toEqual('attacker@example.com');
+});
+
+test('the name can be changed without the current password', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    Livewire::test(Profile::class)
+        ->set('name', 'Renamed')
+        ->set('email', $user->email)
+        ->call('updateProfileInformation')
+        ->assertHasNoErrors();
+
+    expect($user->refresh()->name)->toEqual('Renamed');
+});
+
+test('a passwordless user is told to set a password before changing email', function () {
+    $user = User::factory()->create(['password' => null]);
+
+    $this->actingAs($user);
+
+    Livewire::test(Profile::class)
+        ->set('email', 'new@example.com')
+        ->call('updateProfileInformation')
+        ->assertHasErrors(['current_password']);
+
+    expect($user->refresh()->email)->not->toEqual('new@example.com');
 });

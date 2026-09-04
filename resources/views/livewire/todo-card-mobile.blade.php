@@ -10,7 +10,7 @@
                     />
                     <h3 class="font-medium text-sm {{ $task->completed ? 'line-through text-zinc-500' : '' }}"
                         wire:click.stop="edit({{ $task->id }})">
-                        {!! $task->title !!}
+                        {{ $task->title }}
                     </h3>
                 </div>
                 
@@ -49,17 +49,17 @@
                     <flux:accordion.heading>
                         <div class="text-sm text-zinc-600 dark:text-zinc-400">
 
-                        {!! Str::limit($task->desc, 50) !!}
+                        {{ $task->desc_preview }}
                         </div>
                         </flux:accordion.heading>
                     <flux:accordion.content>
-                            {!! Str::markdown($task->desc) !!}
+                            {!! $task->desc_html !!}
                     </flux:accordion.content>
                     </flux:accordion.item>
                 </flux:accordion>
                 @else
                 <p class="text-sm text-zinc-600 dark:text-zinc-400">
-                    {!! Str::markdown($task->desc) !!}
+                    {!! $task->desc_html !!}
                 </p>
                 @endif
 
