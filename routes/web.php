@@ -92,7 +92,7 @@ require __DIR__.'/auth.php';
 // stable day to day.
 Route::get('/.well-known/security.txt', function () {
     $fields = [
-        'Contact' => 'mailto:security@fxrm.com',
+        'Contact' => 'mailto:'.config('security.contact'),
         'Expires' => now()->addYear()->startOfMonth()->toIso8601ZuluString(),
         'Preferred-Languages' => 'en',
         'Canonical' => url('/.well-known/security.txt'),

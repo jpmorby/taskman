@@ -14,8 +14,20 @@ it('serves security.txt as plain text', function () {
     expect($response->headers->get('Content-Type'))->toStartWith('text/plain');
 });
 
-it('advertises the security contact', function () {
-    expect(securityTxt())->toContain('Contact: mailto:security@fxrm.com');
+it('advertises the configured security contact', function () {
+    config(['security.contact' => 'security@task.me.uk']);
+
+    expect(securityTxt())->toContain('Contact: mailto:security@task.me.uk');
+});
+
+// The address is per-deployment: this is a white-label app and the contact for
+// one brand's instance must never be another brand's mailbox.
+it('does not hard-code a contact address', function () {
+    config(['security.contact' => 'disclosure@example.org']);
+
+    expect(securityTxt())
+        ->toContain('Contact: mailto:disclosure@example.org')
+        ->not->toContain('fxrm.com');
 });
 
 it('states a canonical url and language', function () {
