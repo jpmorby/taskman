@@ -33,5 +33,14 @@ jobs:
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
           npm install
 
+      - name: Prepare Environment
+        run: cp .env.example .env
+
       - name: Run Pint
         run: vendor/bin/pint --test
+
+      - name: Run Rector
+        run: vendor/bin/rector process --dry-run --no-progress-bar --no-ansi
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --no-progress --no-ansi --memory-limit=1G

@@ -309,7 +309,7 @@ class TaskApiTest extends TestCase
     public function test_can_sort_tasks()
     {
         // Create tasks with different due dates
-        $task1 = Task::factory()->create([
+        Task::factory()->create([
             'user_id' => $this->user->id,
             'due' => now()->addDays(5),
         ]);

@@ -78,7 +78,7 @@ class User extends Authenticatable implements HasPasskeys, MustVerifyEmail
     public function identities()
     {
 
-        return $this->hasMany('App\Models\SocialIdentity');
+        return $this->hasMany(SocialIdentity::class);
 
     }
 

@@ -55,9 +55,7 @@ test('user can delete their account with correct password', function () {
 
     // Mock the Logout action to prevent actual logout during test
     $logoutMock = Mockery::mock(Logout::class);
-    $logoutMock->shouldReceive('__invoke')->andReturn(function () {
-        return Auth::user();
-    });
+    $logoutMock->shouldReceive('__invoke')->andReturn(fn () => Auth::user());
     $this->app->instance(Logout::class, $logoutMock);
 
     // Delete the user with correct password
@@ -80,9 +78,7 @@ test('delete user form redirects to home page after deletion', function () {
 
     // Mock the Logout action to prevent actual logout during test
     $logoutMock = Mockery::mock(Logout::class);
-    $logoutMock->shouldReceive('__invoke')->andReturn(function () {
-        return Auth::user();
-    });
+    $logoutMock->shouldReceive('__invoke')->andReturn(fn () => Auth::user());
     $this->app->instance(Logout::class, $logoutMock);
 
     // Delete the user and check redirect
