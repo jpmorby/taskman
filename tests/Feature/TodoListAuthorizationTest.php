@@ -3,7 +3,6 @@
 use App\Livewire\TodoList;
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -22,8 +21,7 @@ beforeEach(function () {
 test('a user cannot delete another users task', function () {
     $this->actingAs($this->intruder);
 
-    expect(fn () => Livewire::test(TodoList::class)->call('delete', $this->victimTask->id))
-        ->toThrow(ModelNotFoundException::class);
+    Livewire::test(TodoList::class)->call('delete', $this->victimTask->id)->assertNotFound();
 
     $this->assertDatabaseHas('tasks', ['id' => $this->victimTask->id]);
 });
@@ -33,8 +31,7 @@ test('a user cannot toggle another users task', function () {
 
     $this->actingAs($this->intruder);
 
-    expect(fn () => Livewire::test(TodoList::class)->call('toggleCompleted', $this->victimTask->id))
-        ->toThrow(ModelNotFoundException::class);
+    Livewire::test(TodoList::class)->call('toggleCompleted', $this->victimTask->id)->assertNotFound();
 
     expect($this->victimTask->fresh()->completed)->toBe($completed);
 });
@@ -42,15 +39,13 @@ test('a user cannot toggle another users task', function () {
 test('a user cannot load another users task into the edit modal', function () {
     $this->actingAs($this->intruder);
 
-    expect(fn () => Livewire::test(TodoList::class)->call('edit', $this->victimTask->id))
-        ->toThrow(ModelNotFoundException::class);
+    Livewire::test(TodoList::class)->call('edit', $this->victimTask->id)->assertNotFound();
 });
 
 test('a user cannot read another users task through showCard', function () {
     $this->actingAs($this->intruder);
 
-    expect(fn () => Livewire::test(TodoList::class)->call('showCard', $this->victimTask->id))
-        ->toThrow(ModelNotFoundException::class);
+    Livewire::test(TodoList::class)->call('showCard', $this->victimTask->id)->assertNotFound();
 });
 
 test('the owner can still act on their own task', function () {
