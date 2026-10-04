@@ -90,13 +90,15 @@ class Login extends Component
             $optionsJson,
         );
 
-        if (! $passkey) {
+        $user = $passkey?->authenticatable;
+
+        if (! $user instanceof User) {
             $this->addError('passkey', __('The passkey could not be verified. Please try again.'));
 
             return;
         }
 
-        Auth::login($passkey->authenticatable);
+        Auth::login($user);
         Session::regenerate();
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
@@ -171,7 +173,7 @@ class Login extends Component
 
         $authUser = $this->findOrCreateUser($providerUser, $provider);
 
-        if (! $authUser) {
+        if (! $authUser instanceof User) {
             return $this->failedSocialLogin(__('An account already exists for that email address. Please sign in with your password. Once that address is verified you will be able to sign in with :provider.', [
                 'provider' => Str::title($provider),
             ]));

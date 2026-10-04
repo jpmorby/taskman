@@ -41,7 +41,7 @@ class TaskBackupManager extends Component
 
     public $potentialDuplicates = [];
 
-    public $backupData = null;
+    public $backupData;
 
     protected $rules = [
         'duplicateAction' => 'required|in:skip,overwrite,keep_both',

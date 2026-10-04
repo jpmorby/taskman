@@ -21,9 +21,7 @@ use Illuminate\Validation\Rule;
 |
 */
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::get('/user', fn (Request $request) => $request->user())->middleware('auth:sanctum');
 
 // API v1 Routes
 Route::prefix('v1')->middleware('auth:sanctum')->group(function () {

@@ -52,7 +52,6 @@ test('logout action regenerates token', function () {
 
     // Use reflection to access the private method without executing the redirect
     $reflectionMethod = new ReflectionMethod(Logout::class, '__invoke');
-    $reflectionMethod->setAccessible(true);
     $reflectionMethod->invoke($logout);
 
     // Verify token was regenerated

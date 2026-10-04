@@ -43,9 +43,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/passkeys', Passkeys::class)->name('settings.passkeys');
 });
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', fn () => view('welcome'))->name('home');
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 

@@ -46,7 +46,7 @@ class Task extends Model
         parent::boot();
 
         static::creating(function ($task) {
-            $task->uuid = $task->uuid ?? Str::uuid();
+            $task->uuid ??= Str::uuid();
         });
     }
 
