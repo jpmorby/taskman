@@ -32,6 +32,13 @@ Route::middleware('guest')->group(function () {
         ->whereIn('provider', Login::PROVIDERS)
         ->name('login.socialite.callback');
 
+    // Apple returns the user with a cross-site form POST (response_mode=form_post),
+    // which cannot carry a CSRF token; it is exempted in bootstrap/app.php. The
+    // OAuth `state` check in Socialite still guards it.
+    Route::post('login/apple/callback', [Login::class, 'handleProviderCallback'])
+        ->defaults('provider', 'apple')
+        ->name('login.socialite.callback.apple');
+
 });
 
 Route::middleware(['auth'])->group(function () {

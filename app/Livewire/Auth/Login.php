@@ -33,7 +33,23 @@ class Login extends Component
      *
      * @var list<string>
      */
-    public const PROVIDERS = ['github', 'google', 'discord'];
+    public const PROVIDERS = ['github', 'google', 'discord', 'apple'];
+
+    /**
+     * The providers a visitor may actually use: wired up above, switched on in
+     * config/services.php (`enabled`, on unless set otherwise) and given a client id.
+     * Anything else gets no button and its routes 404.
+     *
+     * @return list<string>
+     */
+    public static function enabledProviders(): array
+    {
+        return array_values(array_filter(
+            self::PROVIDERS,
+            fn (string $provider) => config("services.{$provider}.enabled", true)
+                && filled(config("services.{$provider}.client_id")),
+        ));
+    }
 
     #[Validate('required|string|email')]
     public string $email = '';
@@ -134,7 +150,7 @@ class Login extends Component
 
     public function redirectToProvider(string $provider)
     {
-        abort_unless(in_array($provider, self::PROVIDERS, true), 404);
+        abort_unless(in_array($provider, self::enabledProviders(), true), 404);
 
         try {
             return Socialite::driver($provider)->redirect();
@@ -154,7 +170,7 @@ class Login extends Component
 
     public function handleProviderCallback(string $provider)
     {
-        abort_unless(in_array($provider, self::PROVIDERS, true), 404);
+        abort_unless(in_array($provider, self::enabledProviders(), true), 404);
 
         try {
             $providerUser = Socialite::driver($provider)->user();
