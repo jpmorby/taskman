@@ -1,25 +1,19 @@
 <div class="form-group">
     <div class="col-md-6 col-md-offset-4 text-center">
-        @if (Route::has('login.socialite'))
+        @if (Route::has('login.socialite') && \App\Livewire\Auth\Login::enabledProviders() !== [])
             <flux:table>
                 <flux:table.rows>
                     <flux:table.row>
-                        <flux:table.cell>
-                            <flux:button href="/login/github" icon="github" variant="outline" class="btn btn-github"> Github
-                            </flux:button>
-                        </flux:table.cell>
-                        <flux:table.cell>
-                            <flux:button href="/login/google" icon="google" variant="outline" class="btn btn-google"> Google
-                            </flux:button>
-                        </flux:table.cell>
-                        <flux:table.cell>
-                            <flux:button href="/login/discord" icon="discord" variant="outline" class="btn btn-discord">
-                                Discord</flux:button>
-                        </flux:table.cell>
-                        </flux:row>
-                        </flux:rows>
+                        @foreach (\App\Livewire\Auth\Login::enabledProviders() as $provider)
+                            <flux:table.cell>
+                                <flux:button href="{{ route('login.socialite', $provider) }}" icon="{{ $provider }}" variant="outline" class="btn btn-{{ $provider }}">
+                                    {{ Str::title($provider) }}
+                                </flux:button>
+                            </flux:table.cell>
+                        @endforeach
+                    </flux:table.row>
+                </flux:table.rows>
             </flux:table>
-
         @endif
     </div>
 </div>

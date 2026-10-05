@@ -45,6 +45,16 @@ function googleUser(?string $email, bool $verified, array $attributes = []): Soc
     );
 }
 
+// Providers only exist once they have a client id, so give the tests one rather
+// than depend on whatever the local .env holds.
+beforeEach(function () {
+    config([
+        'services.github.client_id' => 'github-id',
+        'services.google.client_id' => 'google-id',
+        'services.discord.client_id' => 'discord-id',
+    ]);
+});
+
 test('unknown provider slugs 404 rather than reaching socialite', function () {
     $this->get('/login/twitter')->assertNotFound();
     $this->get('/login/twitter/callback')->assertNotFound();

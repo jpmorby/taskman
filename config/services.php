@@ -61,13 +61,21 @@ return [
         'redirect' => env('DISCORD_CALLBACK_URL'),
     ],
 
-    // ADDITIONAL PROVIDERS AT https://socialiteproviders.com/
+    // Sign in with Apple. Off unless APPLE_LOGIN_ENABLED=true, and only offered
+    // once APPLE_CLIENT_ID is set. Authenticates with a private key (key_id,
+    // team_id, private_key), so client_secret stays empty.
+    'apple' => [
+        'enabled' => env('APPLE_LOGIN_ENABLED', false),
+        'client_id' => env('APPLE_CLIENT_ID'),
+        'client_secret' => env('APPLE_CLIENT_SECRET'),
+        'key_id' => env('APPLE_KEY_ID'),
+        'team_id' => env('APPLE_TEAM_ID'),
+        'private_key' => env('APPLE_PRIVATE_KEY'),
+        'passphrase' => env('APPLE_PASSPHRASE'),
+        'redirect' => env('APPLE_CALLBACK_URL'),
+    ],
 
-    //     'apple' => [
-    //   'client_id' => env('APPLE_CLIENT_ID'),
-    //   'client_secret' => env('APPLE_CLIENT_SECRET'),
-    //   'redirect' => env('APPLE_REDIRECT_URI')
-    // ],
+    // ADDITIONAL PROVIDERS AT https://socialiteproviders.com/
     //     'linkedin' => [
     //         'client_id' => env('LINKEDIN_CLIENT_ID'),
     //         'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
