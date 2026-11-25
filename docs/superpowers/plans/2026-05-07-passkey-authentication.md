@@ -1029,7 +1029,7 @@ git commit -m "fix: apply Pint style fixes"
 git push origin main
 ```
 
-- [ ] **Step 4: Deploy via Envoy**
+- [ ] **Step 4: Deploy via Envoy** (RETIRED Nov 2026: pushing to `main` now auto-deploys via Enhance Deploy from GitHub; do not run Envoy. See README.md, Deployment.)
 
 ```bash
 envoy run deploy

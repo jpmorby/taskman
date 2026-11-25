@@ -35,3 +35,23 @@ Using as many FluxUI features as I can to simplify design (as I'm lousy at desig
 ## License
 
 This project is open-sourced software licensed under the [MIT license](LICENSE).
+
+## Deployment
+
+Taskman deploys automatically. It is hosted on [FXRM](https://fxrm.com) web hosting, and the site is connected to this GitHub repository through Enhance's **Deploy from GitHub** feature with auto-deploy turned on for the `main` branch. Every push to `main` starts a new deploy. Do not deploy it by hand.
+
+**The Envoy deploy is retired.** Do not run `envoy run deploy`. `Envoy.blade.php` is kept for reference only.
+
+Why: on 17 November 2026 a dependency update was deployed with `envoy run deploy` while the auto-deploy was already running for the same push. The two deploys ran at the same time and the deploy broke. Push to `main`, check the deploy result, and never start a second deploy alongside it.
+
+## Hosting your own copy on FXRM
+
+Want push-to-deploy for your own Laravel app? Taskman runs on [FXRM web hosting](https://fxrm.com/hosting/web-hosting), and you can set up the same thing:
+
+1. Connect GitHub in the Enhance control panel. Public or private repositories both work, and you choose which repositories the GitHub app can see.
+2. Pick the repository and the branch or tag to deploy from.
+3. Deploy by hand when you're ready, or turn on auto-deploy so every push to that branch or tag starts a new deploy.
+
+FXRM web hosting runs PHP, Laravel, Node.js, static sites and custom apps in UK data centres.
+
+**[Get FXRM web hosting](https://fxrm.com/hosting/web-hosting)**

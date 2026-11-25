@@ -6,6 +6,12 @@ individually.
 
 ## Unreleased (since v0.2.0)
 
+### 2026-11
+- Docs: taskman deploys automatically via Enhance's Deploy from GitHub
+  (auto-deploy on `main`, FXRM web hosting). The Envoy deploy (`envoy run deploy`)
+  is retired; running both at once broke the 17 November 2026 deploy.
+- Docs: README section on hosting your own copy on FXRM.
+
 ### 2026-10
 - CI now runs Rector and Larastan (PHPStan) alongside Pint (#35).
 - Fixed authorization tests for Livewire 4.4.7's 404 handling (#34).

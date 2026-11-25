@@ -1,3 +1,10 @@
+{{--
+    RETIRED (November 2026). Do not run "envoy run deploy".
+    Taskman now deploys automatically: Enhance "Deploy from GitHub" with
+    auto-deploy on the main branch. Running Envoy as well races that deploy
+    and breaks it (17 November 2026). Kept for reference only.
+    See README.md, Deployment.
+--}}
 @setup
     $project_name = "taskman";
     $working_dir = "/var/www/eb171a0a-65ac-40f1-bb18-5e06a148c113/";
